@@ -14,12 +14,18 @@ let score;
 let startBtn;
 let gameStart;
 let bunnyBall, bbStart, sBalls;
-let isBall;
+let isShooter;
 let ballColor;
+let redBall,greenBall,blueBall,orangeBall,yellowBall;
+let ballImage;
 
 // Preload media
 function preload(){
-
+    redBall = loadImage('image/red50.png');
+    greenBall = loadImage('image/green50.png');
+    blueBall = loadImage('image/blue50.png');
+    orangeBall = loadImage('image/orange50.png');
+    yellowBall = loadImage('image/yellow50.png');
 }
 
 // Initialize setup
@@ -32,26 +38,43 @@ function setup(){
     leftSide = new Sprite(5, height*0.5, 10, height, 's');
     rightSide = new Sprite(width-5, height*0.5, 10, height, 's');
 
-    startBtn = new Sprite(width/2, height*0.45, 100, 's');
+    startBtn = new Sprite(width*0.5, height*0.5, 100, 's');
     startBtn.color = 'aqua';
     startBtn.textSize = 26;
     startBtn.text = 'START';
 
-    p1 = new Sprite(width/2, height*0.9, 50, 'd');
+    p1 = new Sprite(width/2, height*0.9, 50, 80, 'd');
 
     bbStart = {
-        x : width/2,
+        x : p1.x,
         y : height*0.8,
     };
-    ballColor =['red','blue','green'];
-    sBalls = new Group();
+    ballColor =['red','green','blue','orange','yellow'];
+    ballImage ={
+        red:redBall,
+        green:greenBall,
+        blue:blueBall,
+        orange:orangeBall,
+        yellow:yellowBall,
+    };
+    let i = round(random(4));
+    
     bunnyBall = new Sprite(bbStart.x, bbStart.y, 50, 'd');
     bunnyBall.visible = false;
-    bunnyBall.color = random(ballColor);
-    isBall = true;
+    bunnyBall.bounciness = 0;
+    bunnyBall.color = ballColor[i];
+         if (i == 0){bunnyBall.img = ballImage.red;}
+    else if (i == 1){bunnyBall.img = ballImage.green;} 
+    else if (i == 2){bunnyBall.img = ballImage.blue;} 
+    else if (i == 3){bunnyBall.img = ballImage.orange;} 
+    else if (i == 4){bunnyBall.img = ballImage.yellow;}
+    isShooter = true;
     p1.overlaps(bunnyBall);
+
+    sBalls = new Group();
+   
     gameStart = false;
-    levelTime = 10;
+    levelTime = 60;
 }
 
 // Draw 
@@ -80,11 +103,11 @@ function draw(){
     if (gameStart){
         // if ((contro.pressing('left')) || (kb.pressing('arrowLeft'))) {  
         if (kb.pressing('arrowLeft')){
-            p1.vel.x = -5;
+            p1.vel.x = -10;
             
-            // if (bunnyBall.y == bbStart.y){
-            //     bunnyBall.vel.x = -5;
-            // }
+            if (bunnyBall.y == bbStart.y){
+                bunnyBall.x = p1.x;
+            }
             // p1.mirror.x = false;
             // p1.ani.play();
             // p1.rotation = 0;
@@ -92,10 +115,10 @@ function draw(){
         }
         // else if ((contro.pressing('right')) || (kb.pressing('arrowRight'))){
         else if (kb.pressing('arrowRight')){
-            p1.vel.x = 5;
-            // if (bunnyBall.y == bbStart.y){
-            //     bunnyBall.vel.x = 5;
-            // }
+            p1.vel.x = 10;
+            if (bunnyBall.y == bbStart.y){
+                bunnyBall.x = p1.x;
+            }
             // p1.mirror.x = true;
             // p1.ani.play();
             // p1.rotation = 0;
@@ -117,27 +140,33 @@ function draw(){
         // }
         else {
             p1.vel.x = 0;
-            p1.vel.y = 0;
-            bunnyBall.vel.x = 0;
+            // bunnyBall.vel.x = 0;
             // p1.rotation = 0;
             // p1.rotationlock = true;
             // p1.ani.stop();
         }
-        if ((leftSide.collided(bunnyBall)) || (rightSide.collided(bunnyBall))){
-            bunnyBall.vel.x = 0;
-        }else if (bunnyBall.y == bbStart.y){
-            bunnyBall.vel.x = p1.vel.x;
-        }
-        
-        if (topSide.collides(bunnyBall)){
+        // if ((leftSide.collided(bunnyBall)) || (rightSide.collided(bunnyBall))){
+        //     bunnyBall.vel.x = 0;
+        // }else if (bunnyBall.y == bbStart.y){
+        //     bunnyBall.vel.x = p1.vel.x;
+        // }
+    
+    bunnyBall.collides(sBalls, checkBall);
+
+        if (bunnyBall.collides(topSide)){
+            let sBall = new sBalls.Sprite(bunnyBall.x, bunnyBall.y, bunnyBall.d, 's');
+            sBall.color = bunnyBall.color;
+            sBall.img = bunnyBall.img;
             bunnyBall.remove();
-            isBall = false;
+            isShooter = false;
             getNewBall();
-        }else{
+        }
         if (kb.pressed('space')){
-            bunnyBall.vel.y = -5;
-            bunnyBall.vel.x = 0;
-        } }
+            bunnyBall.vel.y = -10;
+            // bunnyBall.vel.x = 0;
+        } 
+    
+    // sBalls.colliding()
     } else {
         resetGame();
     }
@@ -155,7 +184,7 @@ function topBar(){
     ///// Start game time when click Start /////
     if (gameStart){
 
-    //   text(score.toString(),width*0.62,height*0.07);
+    text('Score: '+score.toString(),width*0.45,height*0.07);
   
       ///// prevent time to run over 0 /////
       if (gameTime > 0) {
@@ -179,13 +208,39 @@ function resetGame(){
     startBtn.collider = 's';
     floor.visible = false;
     bunnyBall.visible = false;
-    
+    sBalls.removeAll();
 }
 
 function getNewBall(){
-    if (!isBall){
+    if (!isShooter){
+        let i = round(random(4)); 
+        isShooter = !isShooter;
         bunnyBall = new Sprite(p1.x, bbStart.y, 50, 'd');
-        bunnyBall.color = random(ballColor);
-        isBall = !isBall;
+        bunnyBall.bounciness = 0;
+        bunnyBall.color = ballColor[i];
+            if (i == 0){bunnyBall.img = ballImage.red;}
+        else if (i == 1){bunnyBall.img = ballImage.green;} 
+        else if (i == 2){bunnyBall.img = ballImage.blue;} 
+        else if (i == 3){bunnyBall.img = ballImage.orange;} 
+        else if (i == 4){bunnyBall.img = ballImage.yellow;}
     }
+}
+
+function checkBall(bunnyBall, sBall){
+    if (red(bunnyBall.color) === red(sBall.color) && 
+        green(bunnyBall.color) === green(sBall.color) && 
+        blue(bunnyBall.color) === blue(sBall.color)){
+        console.log('match',sBall);
+        score += 100;
+        sBall.remove();
+    } else {
+        let sBall = new sBalls.Sprite(bunnyBall.x, bunnyBall.y, 50, 's');
+        sBall.color = bunnyBall.color;
+        sBall.img = bunnyBall.img;
+        console.log('not match', sBall);
+    }
+    console.log(sBalls.length);
+    bunnyBall.remove();
+    isShooter = false;
+    getNewBall();
 }
