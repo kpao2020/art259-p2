@@ -13,7 +13,7 @@ let gameTime, startTime, levelTime;
 let score;
 let startBtn;
 let gameStart;
-let bunnyBall, bbStart, sBalls;
+let sBall, bbStart, sBalls;
 let isShooter;
 let ballColor;
 let redBall,greenBall,blueBall,orangeBall,yellowBall;
@@ -43,7 +43,10 @@ function setup(){
     startBtn.textSize = 26;
     startBtn.text = 'START';
 
-    p1 = new Sprite(width/2, height*0.9, 50, 80, 'd');
+
+
+
+    p1 = new Sprite(width/2, height*0.9, 50, 50, 'd');
 
     bbStart = {
         x : p1.x,
@@ -57,22 +60,30 @@ function setup(){
         orange:orangeBall,
         yellow:yellowBall,
     };
-    let i = round(random(4));
     
-    bunnyBall = new Sprite(bbStart.x, bbStart.y, 50, 'd');
-    bunnyBall.visible = false;
-    bunnyBall.bounciness = 0;
-    bunnyBall.color = ballColor[i];
-         if (i == 0){bunnyBall.img = ballImage.red;}
-    else if (i == 1){bunnyBall.img = ballImage.green;} 
-    else if (i == 2){bunnyBall.img = ballImage.blue;} 
-    else if (i == 3){bunnyBall.img = ballImage.orange;} 
-    else if (i == 4){bunnyBall.img = ballImage.yellow;}
-    isShooter = true;
-    p1.overlaps(bunnyBall);
-
     sBalls = new Group();
-   
+    sBalls.x = bbStart.x;
+    sBalls.y = bbStart.y;
+    sBalls.d = 50;
+    // sBalls.collider = 'd';
+    sBalls.bounciness = 0;
+    let i = round(random(4));
+    sBalls.color = ballColor[i];
+    //      if (i == 0){sBalls.img = ballImage.red;}
+    // else if (i == 1){sBalls.img = ballImage.green;} 
+    // else if (i == 2){sBalls.img = ballImage.blue;} 
+    // else if (i == 3){sBalls.img = ballImage.orange;} 
+    // else if (i == 4){sBalls.img = ballImage.yellow;}
+
+    sBall = new sBalls.Sprite();
+    // sBall.visible = false;
+
+    p1.rotationLock = true;
+    sBalls.rotationLock = true;
+
+    isShooter = true;
+    // p1.overlaps(sBalls);
+
     gameStart = false;
     levelTime = 60;
 }
@@ -93,7 +104,7 @@ function draw(){
     if (startBtn.mouse.presses()) {
         gameStart = true;
         floor.visible = true;
-        bunnyBall.visible = true;
+        // sBall.visible = true;
         startTime = millis();
         startBtn.visible = false;
         startBtn.collider = 'n';
@@ -104,9 +115,9 @@ function draw(){
         // if ((contro.pressing('left')) || (kb.pressing('arrowLeft'))) {  
         if (kb.pressing('arrowLeft')){
             p1.vel.x = -10;
-            
-            if (bunnyBall.y == bbStart.y){
-                bunnyBall.x = p1.x;
+            console.log(p1.x, sBall.x);
+            if (sBall.y == bbStart.y){
+                sBall.x = p1.x;
             }
             // p1.mirror.x = false;
             // p1.ani.play();
@@ -116,8 +127,9 @@ function draw(){
         // else if ((contro.pressing('right')) || (kb.pressing('arrowRight'))){
         else if (kb.pressing('arrowRight')){
             p1.vel.x = 10;
-            if (bunnyBall.y == bbStart.y){
-                bunnyBall.x = p1.x;
+            console.log(p1.x,sBall.x);
+            if (sBall.y == bbStart.y){
+                sBall.x = p1.x;
             }
             // p1.mirror.x = true;
             // p1.ani.play();
@@ -159,19 +171,32 @@ function draw(){
         //     if (!b.colliding(player)) b.move(player.heading);
         // });
     
-    bunnyBall.collides(sBalls, checkBall);
-
-        if (bunnyBall.collides(topSide)){
-            let sBall = new sBalls.Sprite(bunnyBall.x, bunnyBall.y, bunnyBall.d, 's');
-            sBall.color = bunnyBall.color;
-            sBall.img = bunnyBall.img;
-            bunnyBall.remove();
-            isShooter = false;
-            getNewBall();
+        if (sBalls.length > 1){
+            sBalls.collides(sBalls, (a,b) => {
+                if (red(a.color) === red(b.color) && 
+                    green(a.color) === green(b.color) && 
+                    blue(a.color) === blue(b.color)){
+                    score += 100;
+                    a.remove();
+                    b.remove();
+                    console.log('match',sBalls.length,'balls left');
+                }
+                // else{
+                //     GlueJoint(a,b);
+                //     console.log(a,b,sBalls);
+                // }
+            });
         }
 
+        sBalls.collides(topSide, (sBall, topSide) => {
+            sBall.collider = 's';
+            isShooter = false;
+            getNewBall();
+        });
+            
+        
         if (kb.pressed('space')){
-            bunnyBall.vel.y = -10;
+            sBall.vel.y = -10;
         } 
     } else {
         resetGame();
@@ -206,50 +231,42 @@ function topBar(){
 function resetGame(){
     p1.x = width/2;
     p1.y = height*0.9;
-    bunnyBall.x = bbStart.x;
-    bunnyBall.y = bbStart.y;
-    bunnyBall.vel.y = 0;
+    // sBall.x = bbStart.x;
+    // sBall.y = bbStart.y;
+    // sBall.vel.y = 0;
     startBtn.visible = true;
     startBtn.collider = 's';
     floor.visible = false;
-    bunnyBall.visible = false;
-    sBalls.removeAll();
+    // sBalls.removeAll();
+    // getNewBall();
 }
 
 function getNewBall(){
-    if (!isShooter){
-        let i = round(random(4)); 
+    if (!isShooter){ 
         isShooter = !isShooter;
-        bunnyBall = new Sprite(p1.x, bbStart.y, 50, 'd');
-        bunnyBall.bounciness = 0;
-        bunnyBall.color = ballColor[i];
-            if (i == 0){bunnyBall.img = ballImage.red;}
-        else if (i == 1){bunnyBall.img = ballImage.green;} 
-        else if (i == 2){bunnyBall.img = ballImage.blue;} 
-        else if (i == 3){bunnyBall.img = ballImage.orange;} 
-        else if (i == 4){bunnyBall.img = ballImage.yellow;}
+        sBall = new sBalls.Sprite();
     }
 }
 
-function checkBall(bunnyBall, sBall){
-    if (red(bunnyBall.color) === red(sBall.color) && 
-        green(bunnyBall.color) === green(sBall.color) && 
-        blue(bunnyBall.color) === blue(sBall.color)){
-        score += 100;
-        sBall.remove();
-        console.log('match',sBalls);
-        // checkChild();
-    } else {
-        let sBall = new sBalls.Sprite(bunnyBall.x, bunnyBall.y, 50, 's');
-        sBall.color = bunnyBall.color;
-        sBall.img = bunnyBall.img;
-        console.log('not match', sBalls);
-    }
-    console.log(sBalls.length);
-    bunnyBall.remove();
-    isShooter = false;
-    getNewBall();
-}
+// function checkBall(bunnyBall, sBall){
+//     if (red(bunnyBall.color) === red(sBall.color) && 
+//         green(bunnyBall.color) === green(sBall.color) && 
+//         blue(bunnyBall.color) === blue(sBall.color)){
+//         score += 100;
+//         sBall.remove();
+//         console.log('match',sBalls);
+//         // checkChild();
+//     } else {
+//         let sBall = new sBalls.Sprite(bunnyBall.x, bunnyBall.y, 50, 's');
+//         sBall.color = bunnyBall.color;
+//         sBall.img = bunnyBall.img;
+//         console.log('not match', sBalls);
+//     }
+//     console.log(sBalls.length);
+//     bunnyBall.remove();
+//     isShooter = false;
+//     getNewBall();
+// }
 
 // function checkChild(){
 //     let child = [];
