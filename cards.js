@@ -93,6 +93,7 @@ function setup() {
   endMessage = new Sprite(width*0.5, height*0.3, 1, 'n');
   endMessage.color = 'lightyellow';
   endMessage.textSize = 50;
+  endMessage.textColor = 'red';
   endMessage.visible = false;
 }
 
@@ -104,8 +105,10 @@ function draw() {
   ///// start the game and timer /////
   if (startBtn.mouse.hovering()){
       startBtn.color = 'yellow';
+      cursor(HAND);
   } else {
       startBtn.color = 'lime';
+      cursor(ARROW);
   }
   
   if (startBtn.mouse.presses()) {
