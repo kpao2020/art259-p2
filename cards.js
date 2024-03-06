@@ -10,7 +10,11 @@ let flipCards = []; // Array to track flipped cards (2 max)
 let cardImages = []; // Array of card images
 let levelImages = []; // Array of images for each level
 let backImage; // Back of card image
-let cardSize; // Card size
+let cardSize = { // Card size
+      w:100,
+      h:150
+    };
+let space = 20;
 let level;
 let gameTime, startTime, levelTime;
 let startBtn;
@@ -26,7 +30,8 @@ function preload() {
 }
 
 function setup() {
-  
+  // level contains row and column size
+  // which adjust how many card images involved per level
   level = {
     row: 4,
     col: 5
@@ -36,36 +41,21 @@ function setup() {
     levelImages.push(cardImages[x % cardImages.length]);
   }
   shuffle(levelImages, true);
-  cardSize = {
-    w:100,
-    h:150
-  }
 
-  space = 20;
   // no Stroke for cards
   noStroke();
+
   // 0.5 row space for header
   createCanvas(space + level.col*(cardSize.w + space), (level.row + 0.5)*(cardSize.h + space));
-  // level depends on row and column size
-  // adjust how many card images involved per level
 
-  startBtn = new Sprite(width*0.5, height*0.5, 100, 's');
-  // startBtn.color = 'lime';
-  startBtn.textSize = 26;
+  startBtn = new Sprite(width*0.5, height*0.5, 150, 's');
+  startBtn.textSize = 28;
   startBtn.text = 'START';
   gameStart = false;
   levelTime = 60;
-  score = 0;
+  // score = 0;
 
-  // Create new card objects
-  for (let i = 0; i < level.col; i++) {
-    for (let j = 0; j < level.row; j++) {
-      let x = i * (cardSize.w + space) + space;
-      let y = (j + 0.5) * (cardSize.h + space);
-      let imgIndex = i * level.row + j;
-      cards.push(new Card(x, y, cardSize, levelImages[imgIndex]));
-    }
-  }
+  // createLevel(level); 
 }
 
 function draw() {
@@ -85,14 +75,14 @@ function draw() {
       startTime = millis();
       startBtn.visible = false;
       startBtn.collider = 'n';
+      createLevel(level);
   }
 
   // Game Start section
   if (gameStart){
     // Winning condition => no more cards left
     if (cardRemain == 0){
-      cards =[]; // clear card deck
-      text('You Win!',width/2, height/2);
+      endGame();
     } else {
       for (let card of cards) {
         card.display();
@@ -117,7 +107,7 @@ function mousePressed() {
             score += 100;
             flipCards = [];
           } else {
-            // Not a match, flip back after a delay of 0.2 second
+            // Not a match, flip back after a delay of 0.1 second
             // console.log('not match');
             setTimeout(() => {
               flipCards[0].flip();
@@ -127,7 +117,7 @@ function mousePressed() {
               if (score > 0){
                 score -= 50;
               }
-            }, 200);
+            }, 100);
           }
         }
       }
@@ -192,7 +182,30 @@ function topBar(){
   }
 }
 
+function createLevel(level){
+    // Create new card objects
+    for (let i = 0; i < level.col; i++) {
+      for (let j = 0; j < level.row; j++) {
+        let x = i * (cardSize.w + space) + space;
+        let y = (j + 0.5) * (cardSize.h + space);
+        let imgIndex = i * level.row + j;
+        cards.push(new Card(x, y, cardSize, levelImages[imgIndex]));
+      }
+    }
+}
+
+function endGame(){
+  text('You Win!\n\nYour Score : '+score.toString(), width/2, height/2);
+  setTimeout(() => {
+    gameStart = false;
+  }, 1000);
+}
+
 function resetGame(){
   startBtn.visible = true;
   startBtn.collider = 's';
+  shuffle(levelImages, true);
+  cards=[];
+  cardRemain = level.row * level.col;
+  score = 0;
 }
