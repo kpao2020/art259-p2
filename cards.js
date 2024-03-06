@@ -52,10 +52,7 @@ function setup() {
   startBtn.textSize = 28;
   startBtn.text = 'START';
   gameStart = false;
-  levelTime = 60;
-  // score = 0;
-
-  // createLevel(level); 
+  levelTime = 60; 
 }
 
 function draw() {
@@ -147,7 +144,7 @@ class Card {
 
   // check if mouse is 'hover' within each card area
   hovers(px, py) {
-    return px > this.x && px < this.x + this.w && py > this.y && py < this.y + this.h;
+    return (px > this.x && px < this.x + this.w && py > this.y && py < this.y + this.h);
   }
 
   // flip state
