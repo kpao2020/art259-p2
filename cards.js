@@ -6,40 +6,40 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 let cards = []; // Array to store card objects
-let flippedCards = []; // Array to track flipped cards
-let cardImages = []; // Array of card images (you can replace these with your own images)
-let gridSize = 4; // Grid size (4x4 in this example)
-let cardSize = 200; // Card size (adjust as needed)
+let flipCds = []; // Array to track flipped cards (2 max)
+let cardImages = []; // Array of card images
+let rowSize = 4; // Row size
+let colSize = 4; // Column size
+let cardSize = 100; // Card size: 100px
 
 function preload() {
-  for (let i = 0; i < gridSize * gridSize / 2; i++) {
-    cardImages.push(loadImage('image/card'+i+'.png')); // Load your card images (e.g., card0.png, card1.png, etc.)
+  for (let i = 1; i < 9; i++) {
+    cardImages.push(loadImage('image/card'+i+'.png')); // Load your card images
   }
 }
 
 function setup() {
-  createCanvas(1000, 1000);
+  createCanvas(windowWidth * 0.8, windowHeight * 0.8);
   shuffle(cardImages, true); // Shuffle the card images
-  console.log(cardImages);
 
   // Create card objects
-  for (let i = 0; i < gridSize; i++) {
-    for (let j = 0; j < gridSize; j++) {
+  for (let i = 0; i < colSize; i++) {
+    for (let j = 0; j < rowSize; j++) {
       let x = j * cardSize;
       let y = i * cardSize;
-      let imgIndex = i * gridSize + j;
+      let imgIndex = (i * rowSize + j) % cardImages.length;
       console.log('imgIndex',imgIndex);
       cards.push(new Card(x, y, cardSize, cardImages[imgIndex]));
     }
   }
-  console.log(cards);
+  console.log(cards.length);
 }
 
 function draw() {
   background(220);
   for (let card of cards) {
     card.display();
-    console.log(card);
+    // console.log(card);
   }
 }
 
@@ -47,17 +47,19 @@ function mousePressed() {
   for (let card of cards) {
     if (card.contains(mouseX, mouseY) && !card.flipped) {
       card.flip();
-      flippedCards.push(card);
-      if (flippedCards.length === 2) {
-        if (flippedCards[0].img === flippedCards[1].img) {
+      flipCds.push(card);
+      if (flipCds.length === 2) {
+        if (flipCds[0].img === flipCds[1].img) {
           // Matched!
-          flippedCards = [];
+          console.log('match');
+          flipCds = [];
         } else {
           // Not a match, flip back after a delay
+          console.log('not match');
           setTimeout(() => {
-            flippedCards[0].flip();
-            flippedCards[1].flip();
-            flippedCards = [];
+            flipCds[0].flip();
+            flipCds[1].flip();
+            flipCds = [];
           }, 1000);
         }
       }
