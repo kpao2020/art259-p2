@@ -238,7 +238,7 @@ function checkBall(bunnyBall, sBall){
         score += 100;
         sBall.remove();
         console.log('match',sBalls);
-        // checkChild();
+        checkChild();
     } else {
         let sBall = new sBalls.Sprite(bunnyBall.x, bunnyBall.y, 50, 's');
         sBall.color = bunnyBall.color;
@@ -251,23 +251,23 @@ function checkBall(bunnyBall, sBall){
     getNewBall();
 }
 
-// function checkChild(){
-//     let child = [];
-//     for (let i = 0; i < sBalls.length; i++){
-//         for (let j = 1; j < sBalls.length; j++){
-//             if ((dist(sBalls[i].x, sBalls[i].y, sBalls[j].x,sBalls[j].y)<=50)&&
-//                  dist(sBalls[i].x, sBalls[i].y, sBalls[j].x,sBalls[j].y)>0){
-//                 if (sBalls[i].y > sBalls[j].y){
-//                     child.push(j);
-//                     console.log(j+' is smaller than '+i);
-//                 }
-//             }
-//         }
-//     }
-//     console.log(child);
-//     for (let k = 0; k < child.length; k++){
-//         index = child[k];
-//         console.log('k',k,'index ',index);
-//         sBalls[index].remove();
-//     }
-// }
+function checkChild(){
+    let child = [];
+    for (let i = 0; i < sBalls.length; i++){
+        for (let j = 1; j < sBalls.length; j++){
+            if ((dist(sBalls[i].x, sBalls[i].y, sBalls[j].x,sBalls[j].y)<=50)&&
+                 dist(sBalls[i].x, sBalls[i].y, sBalls[j].x,sBalls[j].y)>0){
+                if (sBalls[i].y > sBalls[j].y){
+                    child.push(j);
+                    console.log(j+' is smaller than '+i);
+                }
+            }
+        }
+    }
+    console.log(child);
+    for (let k = 0; k < child.length; k++){
+        index = child[k];
+        console.log('k',k,'index ',index);
+        sBalls[index].remove();
+    }
+}
