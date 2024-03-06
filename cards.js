@@ -14,26 +14,27 @@ let cardSize = { // Card size
       w:100,
       h:150
     };
-let space = 20;
-let level;
-let gameTime, startTime, levelTime;
-let startBtn;
-let gameStart;
-let score;
-let cardRemain;
-let balls,ballImages;
-let endMessage;
+let space = 20; // Spacer between cards
+let level; // level grid
+let gameTime, startTime, levelTime; // Timing variables
+let startBtn; // Start Button
+let gameStart; // Game Start state = true or false
+let score; // Keep track of score
+let cardRemain; // Keep track of remaining cards
+let balls,ballImages; // End Game animation
+let endMessage; // Display end game message
 
 function preload() {
   for (let i = 0; i < 10; i++) {
     cardImages.push(loadImage('image/card'+i+'.png')); // Load all card images
   }
   backImage = loadImage('image/bunny100.png');
-  ballImages = [ loadImage('image/red50.png'),
-            loadImage('image/green50.png'),
-            loadImage('image/blue50.png'),
-            loadImage('image/orange50.png'),
-            loadImage('image/yellow50.png')];
+  ballImages = [
+    loadImage('image/red50.png'),
+    loadImage('image/green50.png'),
+    loadImage('image/blue50.png'),
+    loadImage('image/orange50.png'),
+    loadImage('image/yellow50.png')];
 }
 
 function setup() {
@@ -44,6 +45,25 @@ function setup() {
     col: 5
   };
   cardRemain = level.row * level.col;
+  
+  // Note: number of card images has to be 2x to 
+  //       fit full level images array
+  //       Example:
+  //          # of card images = 1 to 10
+  //          max card images = 10
+  //
+  //          # of level images = 2,4,6,8,10,12,14,16,18,20
+  //          max level images = 20
+  //
+  //       Easy Level
+  //          level.row = 2;
+  //          level.col = 2;
+  //          for (let x = 0; x < cardRemain; x++){
+  //            levelImages.push(cardImages[x % (cardRemain/2)]);
+  //          }
+  //
+  //  *** cardRemain/2 <= cardImages.length ***
+
   for (let x = 0; x < cardRemain; x++){
     levelImages.push(cardImages[x % cardImages.length]);
   }
@@ -58,8 +78,10 @@ function setup() {
   startBtn = new Sprite(width*0.5, height*0.5, 150, 's');
   startBtn.textSize = 28;
   startBtn.text = 'START';
+  
   gameStart = false;
   levelTime = 60;
+  
   balls = new Group();
   balls.x = () => random(width*0.2, width*0.8);
   balls.y = () => random(height*0.5, height*0.8);
@@ -67,6 +89,7 @@ function setup() {
   balls.collider = 'none';
 	balls.direction = () => random(0, 360);
 	balls.speed = () => random(1, 5);
+  
   endMessage = new Sprite(width*0.5, height*0.3, 1, 'n');
   endMessage.color = 'lightyellow';
   endMessage.textSize = 50;
