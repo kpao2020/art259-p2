@@ -8,6 +8,7 @@
 let cards = []; // Array to store card objects
 let flipCds = []; // Array to track flipped cards (2 max)
 let cardImages = []; // Array of card images
+let backImage; // Back of card image
 let rowSize = 4; // Row size
 let colSize = 4; // Column size
 let cardSize = 100; // Card size: 100px
@@ -16,6 +17,7 @@ function preload() {
   for (let i = 1; i < 9; i++) {
     cardImages.push(loadImage('image/card'+i+'.png')); // Load your card images
   }
+  backImage = loadImage('image/bunny100.png');
 }
 
 function setup() {
@@ -39,7 +41,6 @@ function draw() {
   background(220);
   for (let card of cards) {
     card.display();
-    // console.log(card);
   }
 }
 
@@ -50,12 +51,12 @@ function mousePressed() {
       flipCds.push(card);
       if (flipCds.length === 2) {
         if (flipCds[0].img === flipCds[1].img) {
-          // Matched!
-          console.log('match');
+          // Match section
+          // console.log('match');
           flipCds = [];
         } else {
-          // Not a match, flip back after a delay
-          console.log('not match');
+          // Not a match, flip back after a delay of 1 second
+          // console.log('not match');
           setTimeout(() => {
             flipCds[0].flip();
             flipCds[1].flip();
@@ -76,11 +77,14 @@ class Card {
     this.flipped = false;
   }
 
+  // show card image
   display() {
     fill(255);
     rect(this.x, this.y, this.size, this.size);
     if (this.flipped) {
       image(this.img, this.x, this.y, this.size, this.size);
+    } else {
+      image(backImage, this.x, this.y, this.size, this.size);
     }
   }
 
