@@ -21,12 +21,19 @@ let startBtn;
 let gameStart;
 let score;
 let cardRemain;
+let balls,ballImages;
+let endMessage;
 
 function preload() {
   for (let i = 0; i < 10; i++) {
     cardImages.push(loadImage('image/card'+i+'.png')); // Load all card images
   }
   backImage = loadImage('image/bunny100.png');
+  ballImages = [ loadImage('image/red50.png'),
+            loadImage('image/green50.png'),
+            loadImage('image/blue50.png'),
+            loadImage('image/orange50.png'),
+            loadImage('image/yellow50.png')];
 }
 
 function setup() {
@@ -52,7 +59,18 @@ function setup() {
   startBtn.textSize = 28;
   startBtn.text = 'START';
   gameStart = false;
-  levelTime = 60; 
+  levelTime = 60;
+  balls = new Group();
+  balls.x = () => random(width*0.2, width*0.8);
+  balls.y = () => random(height*0.5, height*0.8);
+  balls.d = 50;
+  balls.collider = 'none';
+	balls.direction = () => random(0, 360);
+	balls.speed = () => random(1, 5);
+  endMessage = new Sprite(width*0.5, height*0.3, 1, 'n');
+  endMessage.color = 'lightyellow';
+  endMessage.textSize = 50;
+  endMessage.visible = false;
 }
 
 function draw() {
@@ -192,10 +210,20 @@ function createLevel(level){
 }
 
 function endGame(){
-  text('You Win!\n\nYour Score : '+score.toString(), width/2, height/2);
+  balls.amount = 20;
+  for (let i = 0; i < balls.amount; i++){
+    balls[i].img = ballImages[i % ballImages.length];
+  }
+  
+  if (balls.cull(-100)){
+    new balls.Sprite();
+  } 
+  endMessage.visible = true;
+  endMessage.text = 'You Win!\n\nYour Score : '+score;
   setTimeout(() => {
     gameStart = false;
-  }, 1000);
+    endMessage.visible = false;
+  }, 5000);
 }
 
 function resetGame(){
