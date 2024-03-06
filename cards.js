@@ -10,15 +10,13 @@ let flipCards = []; // Array to track flipped cards (2 max)
 let cardImages = []; // Array of card images
 let levelImages = []; // Array of images for each level
 let backImage; // Back of card image
-let rowSize; // Row size
-let colSize; // Column size
 let cardSize; // Card size
+let level;
 let gameTime, startTime, levelTime;
 let startBtn;
 let gameStart;
 let score;
 let cardRemain;
-let level;
 
 function preload() {
   for (let i = 0; i < 10; i++) {
@@ -29,39 +27,41 @@ function preload() {
 
 function setup() {
   
-  rowSize = 4;
-  colSize = 5;
   level = {
-    row: rowSize,
-    col: colSize
+    row: 4,
+    col: 5
   };
-  cardRemain = rowSize * colSize;
+  cardRemain = level.row * level.col;
   for (let x = 0; x < cardRemain; x++){
     levelImages.push(cardImages[x % cardImages.length]);
   }
   shuffle(levelImages, true);
-  cardSize = 100;
-  space = 10;
+  cardSize = {
+    w:100,
+    h:150
+  }
+
+  space = 20;
   // no Stroke for cards
   noStroke();
   // 0.5 row space for header
-  createCanvas(space + colSize*(cardSize + space), (level.row + 0.5)*(cardSize + space));
+  createCanvas(space + level.col*(cardSize.w + space), (level.row + 0.5)*(cardSize.h + space));
   // level depends on row and column size
   // adjust how many card images involved per level
 
-  startBtn = new Sprite(width/2,height*0.45,100,'s');
-  startBtn.color = 'aqua';
+  startBtn = new Sprite(width*0.5, height*0.5, 100, 's');
+  // startBtn.color = 'lime';
   startBtn.textSize = 26;
   startBtn.text = 'START';
   gameStart = false;
-  levelTime = 20;
+  levelTime = 60;
   score = 0;
 
   // Create new card objects
   for (let i = 0; i < level.col; i++) {
     for (let j = 0; j < level.row; j++) {
-      let x = i * (cardSize + space) + space;
-      let y = (j + 0.5) * (cardSize + space);
+      let x = i * (cardSize.w + space) + space;
+      let y = (j + 0.5) * (cardSize.h + space);
       let imgIndex = i * level.row + j;
       cards.push(new Card(x, y, cardSize, levelImages[imgIndex]));
     }
@@ -77,7 +77,7 @@ function draw() {
   if (startBtn.mouse.hovering()){
       startBtn.color = 'yellow';
   } else {
-      startBtn.color = 'aqua';
+      startBtn.color = 'lime';
   }
   
   if (startBtn.mouse.presses()) {
@@ -89,7 +89,6 @@ function draw() {
 
   // Game Start section
   if (gameStart){
-
     // Winning condition => no more cards left
     if (cardRemain == 0){
       cards =[]; // clear card deck
@@ -109,12 +108,12 @@ function mousePressed() {
     for (let card of cards) {
       if (card.hovers(mouseX, mouseY) && !card.flipped) {
         card.flip();
+        cardRemain--;
         flipCards.push(card);
         if (flipCards.length === 2) {
           if (flipCards[0].img === flipCards[1].img) {
             // Match section
             // console.log('match');
-            cardRemain -= 2;
             score += 100;
             flipCards = [];
           } else {
@@ -123,6 +122,7 @@ function mousePressed() {
             setTimeout(() => {
               flipCards[0].flip();
               flipCards[1].flip();
+              cardRemain += 2;
               flipCards = [];
               if (score > 0){
                 score -= 50;
@@ -139,24 +139,25 @@ class Card {
   constructor(x, y, size, img) {
     this.x = x;
     this.y = y;
-    this.size = size;
+    this.w = size.w;
+    this.h = size.h;
     this.img = img;
     this.flipped = false; // false = face down
   }
 
   // show card image
   display() {
-    rect(this.x, this.y, this.size, this.size);
+    rect(this.x, this.y, this.w, this.h);
     if (this.flipped) {
-      image(this.img, this.x, this.y, this.size, this.size);
+      image(this.img, this.x, this.y, this.w, this.h);
     } else {
-      image(backImage, this.x, this.y, this.size, this.size);
+      image(backImage, this.x, this.y, this.w, this.h);
     }
   }
 
   // check if mouse is 'hover' within each card area
   hovers(px, py) {
-    return px > this.x && px < this.x + this.size && py > this.y && py < this.y + this.size;
+    return px > this.x && px < this.x + this.w && py > this.y && py < this.y + this.h;
   }
 
   // flip state
