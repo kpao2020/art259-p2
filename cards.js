@@ -125,6 +125,7 @@ function draw() {
     if (cardRemain == 0){
       endGame();
     } else {
+      fill('black'); // set background color of card to black
       for (let card of cards) {
         card.display();
       }
@@ -199,7 +200,7 @@ class Card {
 
 function topBar(){
   textSize(25);
-  fill('black');
+  fill('blue'); // set text color to blue
   textAlign(CENTER);
 
   ///// timer function /////
