@@ -199,7 +199,7 @@ class Card {
 
 function topBar(){
   textSize(25);
-  fill('blue');
+  fill('black');
   textAlign(CENTER);
 
   ///// timer function /////
