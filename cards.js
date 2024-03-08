@@ -25,10 +25,10 @@ let balls,ballImages; // End Game animation
 let endMessage; // Display end game message
 
 function preload() {
-  for (let i = 0; i < 10; i++) {
-    cardImages.push(loadImage('image/card'+i+'.png')); // Load all card images
+  for (let i = 1; i < 11; i++) {
+    cardImages.push(loadImage('image/bunny'+i+'.png')); // Load all card images
   }
-  backImage = loadImage('image/bunny100.png');
+  backImage = loadImage('image/bunnyBack.png');
   ballImages = [
     loadImage('image/red50.png'),
     loadImage('image/green50.png'),
