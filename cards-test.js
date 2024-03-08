@@ -105,8 +105,8 @@ function setup() {
   carrots.rotation = 0;
   carrots.rotationlock = true;
   carrots.visible = true;
-  carrots.collider = 'n';
-  carrots.amount = 3;
+  carrots.collider = 'none';
+  carrots.life = 300; // every 5 sec carrots will reappear in different spots
 
   bunny = new Sprite(width*0.5, height*0.8, 1, 'n');
   bunny.img = bunnyImage;
@@ -122,7 +122,7 @@ function setup() {
   balls.collider = 'none';
 	balls.direction = () => random(0, 360);
 	balls.speed = () => random(1, 5);
-  balls.life = 30; // life is 30 frames = 0.5 sec
+  balls.life = 120; // life is 2 sec
   
   endMessage = new Sprite(width*0.5, height*0.3, 1, 'n');
   endMessage.color = 'lightyellow';
@@ -134,6 +134,13 @@ function setup() {
 function draw() {
   clear();
   background('lightyellow');
+  if (carrots.visible){
+    if (carrots.length < 3){
+      new carrots.Sprite();
+    }
+  } else {
+    carrots.removeAll();
+  }
   topBar(); // display header info
 
   ///// start the game and timer /////
@@ -148,7 +155,7 @@ function draw() {
   if (startBtn.mouse.presses()) {
       gameStart = true;
       allowFlip = true;
-      carrots.ani.stop();
+      endMessage.visible = false;
       carrots.visible = false;
       startTime = millis();
       startBtn.visible = false;
@@ -287,7 +294,7 @@ function winGame(){
     balls[i].img = ballImages[i % ballImages.length];
   }
   
-  if (balls.cull(-20)){
+  if (balls.cull(-50)){
     new balls.Sprite();
   } 
   endMessage.visible = true;
@@ -304,7 +311,6 @@ function winGame(){
 function loseGame(){
   endMessage.visible = true;
   endMessage.text = 'Try Again ?';
-  startBtn.text = 'REPLAY';
   setTimeout(() => {
     endMessage.visible = false;
   }, 5000);
@@ -318,6 +324,7 @@ function resetGame(){
   cardRemain = level.row * level.col;
   score = 0;
   allowFlip = false;
+  carrots.visible = true;
 }
 
 // Window resized function will run when "reload" after a browser window resize

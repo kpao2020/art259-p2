@@ -45,7 +45,7 @@ function preload() {
     loadImage('image/yellow50.png')];
 
   backImage = loadImage('image/bunnyBack.png');
-  bunnImage = loadImage('image/youwinpost.png');
+  bunnyImage = loadImage('image/youwinpost.png');
 }
 
 function setup() {
@@ -103,7 +103,7 @@ function setup() {
   
   carrots = new Group();
   carrots.addAnimation('wiggle', carrotImages[0], carrotImages[1]);
-  carrots.scale = 0.3;
+  carrots.scale = 0.1;
   carrots.x = () => random(width);
   carrots.y = () => random(height);
   carrots.rotation = 0;
