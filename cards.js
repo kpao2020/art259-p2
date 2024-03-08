@@ -1,7 +1,8 @@
 // Team : Ken Pao, Yuying Huang
 // Class: ART 259
+// Project 2
 // Title: <tbd>
-// P5JS link: <tbd>
+// Game link: <tbd>
 // Reference: listed at the end of this file
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -12,7 +13,7 @@ let levelImages = []; // Array of images for each level
 let backImage; // Back of card image
 let cardSize = { // Card size
       w:100,
-      h:150
+      h:120
     };
 let space = 20; // Spacer between cards
 let level; // level grid
@@ -23,6 +24,8 @@ let score; // Keep track of score
 let cardRemain; // Keep track of remaining cards
 let balls,ballImages; // End Game animation
 let endMessage; // Display end game message
+let allowFlip = false;
+
 
 function preload() {
   for (let i = 1; i < 11; i++) {
@@ -113,6 +116,7 @@ function draw() {
   
   if (startBtn.mouse.presses()) {
       gameStart = true;
+      allowFlip = true;
       startTime = millis();
       startBtn.visible = false;
       startBtn.collider = 'n';
@@ -123,7 +127,7 @@ function draw() {
   if (gameStart){
     // Winning condition => no more cards left
     if (cardRemain == 0){
-      endGame();
+      winGame();
     } else {
       fill('black'); // set background color of card to black
       for (let card of cards) {
@@ -137,29 +141,33 @@ function draw() {
 
 function mousePressed() {
   if (gameStart){ // only allow flip when game starts
-    for (let card of cards) {
-      if (card.hovers(mouseX, mouseY) && !card.flipped) {
-        card.flip();
-        cardRemain--;
-        flipCards.push(card);
-        if (flipCards.length === 2) {
-          if (flipCards[0].img === flipCards[1].img) {
-            // Match section
-            // console.log('match');
-            score += 100;
-            flipCards = [];
-          } else {
-            // Not a match, flip back after a delay of 0.1 second
-            // console.log('not match');
-            setTimeout(() => {
-              flipCards[0].flip();
-              flipCards[1].flip();
-              cardRemain += 2;
+    if (allowFlip){
+      for (let card of cards) {
+        if (card.hovers(mouseX, mouseY) && !card.flipped) {
+          card.flip();
+          cardRemain--;
+          flipCards.push(card);
+          if (flipCards.length === 2) {
+            if (flipCards[0].img === flipCards[1].img) {
+              // Match section
+              // console.log('match');
+              score += 100;
               flipCards = [];
-              if (score > 0){
-                score -= 50;
-              }
-            }, 100);
+            } else {
+              // Not a match, flip back after a delay of 0.5 second
+              // console.log('not match');
+              allowFlip = false;
+              setTimeout(() => {
+                flipCards[0].flip();
+                flipCards[1].flip();
+                cardRemain += 2;
+                flipCards = [];
+                if (score > 0){
+                  score -= 50;
+                }
+                allowFlip = true;
+              }, 500);
+            }
           }
         }
       }
@@ -208,7 +216,7 @@ function topBar(){
 
   ///// Start game time when click Start /////
   if (gameStart){
-
+    
     text('Cards: '+cardRemain.toString(),width*0.15,height*0.07);
     text('Score: '+score.toString(),width*0.5,height*0.07);
 
@@ -220,6 +228,9 @@ function topBar(){
     else {
       text('Time : 0',width*0.85,height*0.07);
       gameStart = false;
+      if (cardRemain > 0){
+        loseGame();
+      }
     }
   }
 }
@@ -236,7 +247,7 @@ function createLevel(level){
     }
 }
 
-function endGame(){
+function winGame(){
   balls.amount = 20;
   for (let i = 0; i < balls.amount; i++){
     balls[i].img = ballImages[i % ballImages.length];
@@ -253,6 +264,15 @@ function endGame(){
   }, 5000);
 }
 
+function loseGame(){
+  endMessage.visible = true;
+  endMessage.text = 'Try Again ?';
+  setTimeout(() => {
+    gameStart = false;
+    endMessage.visible = false;
+  }, 5000);
+}
+
 function resetGame(){
   startBtn.visible = true;
   startBtn.collider = 's';
@@ -260,4 +280,5 @@ function resetGame(){
   cards=[];
   cardRemain = level.row * level.col;
   score = 0;
+  allowFlip = false;
 }
