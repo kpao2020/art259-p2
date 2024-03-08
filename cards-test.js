@@ -45,7 +45,7 @@ function preload() {
     loadImage('image/yellow50.png')];
 
   backImage = loadImage('image/bunnyBack.png');
-  bunnyImage = loadImage('image/youwinpost.png');
+  bunnyImage = loadImage('image/bunny300.png');
 }
 
 function setup() {
@@ -58,13 +58,9 @@ function setup() {
   };
   space = 20;
 
-  let tempW = (width-((level.col+1)*space))/level.col;
-  let tempH = (height-((level.row+1)*space))/(level.row+0.5);
-
-  console.log(tempW, tempH);
   cardSize = {
-    w: tempW,
-    h: tempH
+    w: (width-((level.col+1)*space))/level.col,
+    h: (height-((level.row+1)*space))/(level.row+0.5)
   };
   cardRemain = level.row * level.col;
   
@@ -104,11 +100,13 @@ function setup() {
   carrots = new Group();
   carrots.addAnimation('wiggle', carrotImages[0], carrotImages[1]);
   carrots.scale = 0.1;
-  carrots.x = () => random(width);
-  carrots.y = () => random(height);
+  carrots.x = () => random(width*0.2, width*0.8);
+  carrots.y = () => random(height*0.2, height*0.8);
   carrots.rotation = 0;
   carrots.rotationlock = true;
   carrots.visible = true;
+  carrots.collider = 'none';
+  carrots.life = 300; // every 5 sec carrots will reappear in different spots
 
   bunny = new Sprite(width*0.5, height*0.8, 1, 'n');
   bunny.img = bunnyImage;
@@ -124,6 +122,7 @@ function setup() {
   balls.collider = 'none';
 	balls.direction = () => random(0, 360);
 	balls.speed = () => random(1, 5);
+  balls.life = 120; // life is 2 sec
   
   endMessage = new Sprite(width*0.5, height*0.3, 1, 'n');
   endMessage.color = 'lightyellow';
@@ -135,6 +134,13 @@ function setup() {
 function draw() {
   clear();
   background('lightyellow');
+  if (carrots.visible){
+    if (carrots.length < 3){
+      new carrots.Sprite();
+    }
+  } else {
+    carrots.removeAll();
+  }
   topBar(); // display header info
 
   ///// start the game and timer /////
@@ -149,6 +155,7 @@ function draw() {
   if (startBtn.mouse.presses()) {
       gameStart = true;
       allowFlip = true;
+      endMessage.visible = false;
       carrots.visible = false;
       startTime = millis();
       startBtn.visible = false;
@@ -281,17 +288,18 @@ function createLevel(level){
 }
 
 function winGame(){
-  bunny.visible = true;
+  
   balls.amount = 20;
   for (let i = 0; i < balls.amount; i++){
     balls[i].img = ballImages[i % ballImages.length];
   }
   
-  if (balls.cull(-100)){
+  if (balls.cull(-50)){
     new balls.Sprite();
   } 
   endMessage.visible = true;
   endMessage.text = 'You Win!\n\nYour Score : '+score;
+  bunny.visible = true;
 
   setTimeout(() => {
     bunny.visible = false;
@@ -304,7 +312,6 @@ function loseGame(){
   endMessage.visible = true;
   endMessage.text = 'Try Again ?';
   setTimeout(() => {
-    gameStart = false;
     endMessage.visible = false;
   }, 5000);
 }
@@ -317,6 +324,7 @@ function resetGame(){
   cardRemain = level.row * level.col;
   score = 0;
   allowFlip = false;
+  carrots.visible = true;
 }
 
 // Window resized function will run when "reload" after a browser window resize
