@@ -11,41 +11,60 @@ let flipCards = []; // Array to track flipped cards (2 max)
 let cardImages = []; // Array of card images
 let levelImages = []; // Array of images for each level
 let backImage; // Back of card image
-let cardSize = { // Card size
-      w:100,
-      h:120
-    };
-let space = 20; // Spacer between cards
+let cardSize; // Card size based on device screen
+let space; // Spacer between cards
 let level; // level grid
 let gameTime, startTime, levelTime; // Timing variables
 let startBtn; // Start Button
 let gameStart; // Game Start state = true or false
 let score; // Keep track of score
 let cardRemain; // Keep track of remaining cards
-let balls,ballImages; // End Game animation
+let balls, ballImages; // End Game animation
 let endMessage; // Display end game message
-let allowFlip = false;
+let allowFlip = false; // Flip control state
+let carrots, carrotImages=[]; // Start page animation
+let bunny, bunnyImage; // Win page image
 
 
 function preload() {
   for (let i = 1; i < 11; i++) {
-    cardImages.push(loadImage('image/bunny'+i+'.png')); // Load all card images
+    // Load all card images
+    cardImages.push(loadImage('image/bunny'+i+'.png')); 
   }
-  backImage = loadImage('image/bunnyBack.png');
+
+  for (let j = 1; j < 3; j++) {
+    // load carrot animation images
+    carrotImages.push(loadImage('image/carrotmove'+j+'.png')); 
+  }
+
   ballImages = [
     loadImage('image/red50.png'),
     loadImage('image/green50.png'),
     loadImage('image/blue50.png'),
     loadImage('image/orange50.png'),
     loadImage('image/yellow50.png')];
+
+  backImage = loadImage('image/bunnyBack.png');
+  bunnImage = loadImage('image/youwinpost.png');
 }
 
 function setup() {
+  createCanvas(windowWidth*0.9, windowHeight*0.9);
   // level contains row and column size
   // which adjust how many card images involved per level
   level = {
     row: 4,
     col: 5
+  };
+  space = 20;
+
+  let tempW = (width-((level.col+1)*space))/level.col;
+  let tempH = (height-((level.row+1)*space))/(level.row+0.5);
+
+  console.log(tempW, tempH);
+  cardSize = {
+    w: tempW,
+    h: tempH
   };
   cardRemain = level.row * level.col;
   
@@ -76,12 +95,25 @@ function setup() {
   noStroke();
 
   // 0.5 row space for header
-  createCanvas(space + level.col*(cardSize.w + space), (level.row + 0.5)*(cardSize.h + space));
+  // createCanvas(space + level.col*(cardSize.w + space), (level.row + 0.5)*(cardSize.h + space));
 
   startBtn = new Sprite(width*0.5, height*0.5, 150, 's');
   startBtn.textSize = 28;
   startBtn.text = 'START';
   
+  carrots = new Group();
+  carrots.addAnimation('wiggle', carrotImages[0], carrotImages[1]);
+  carrots.scale = 0.3;
+  carrots.x = () => random(width);
+  carrots.y = () => random(height);
+  carrots.rotation = 0;
+  carrots.rotationlock = true;
+  carrots.visible = true;
+
+  bunny = new Sprite(width*0.5, height*0.8, 1, 'n');
+  bunny.img = bunnyImage;
+  bunny.visible = false;
+
   gameStart = false;
   levelTime = 60;
   
@@ -117,6 +149,7 @@ function draw() {
   if (startBtn.mouse.presses()) {
       gameStart = true;
       allowFlip = true;
+      carrots.visible = false;
       startTime = millis();
       startBtn.visible = false;
       startBtn.collider = 'n';
@@ -248,6 +281,7 @@ function createLevel(level){
 }
 
 function winGame(){
+  bunny.visible = true;
   balls.amount = 20;
   for (let i = 0; i < balls.amount; i++){
     balls[i].img = ballImages[i % ballImages.length];
@@ -258,7 +292,9 @@ function winGame(){
   } 
   endMessage.visible = true;
   endMessage.text = 'You Win!\n\nYour Score : '+score;
+
   setTimeout(() => {
+    bunny.visible = false;
     gameStart = false;
     endMessage.visible = false;
   }, 5000);
@@ -281,4 +317,10 @@ function resetGame(){
   cardRemain = level.row * level.col;
   score = 0;
   allowFlip = false;
+}
+
+// Window resized function will run when "reload" after a browser window resize
+function windowResized(){
+  // Canvas is set to 80% width and height - match setup scale
+  resizeCanvas(windowWidth*0.9, windowHeight*0.9);
 }
