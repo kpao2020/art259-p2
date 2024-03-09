@@ -60,14 +60,14 @@ function setup() {
   noStroke();
 
   balls = new Group();
-  balls.x = () => random(width*0.2, width*0.8);
-  balls.y = () => random(height*0.5, height*0.8);
+  balls.x = width*0.58;//() => random(width*0.2, width*0.8);
+  balls.y = height*0.7;//() => random(height*0.5, height*0.8);
   balls.d = 5;
   balls.collider = 'none';
 	balls.direction = () => random(0, 360);
 	balls.speed = 2;
   balls.visible = false;
-  balls.life = 30;
+  balls.life = 100;
 
   carrots = new Group();
   carrots.addAnimation('wiggle', carrotImages[0], carrotImages[1]);
@@ -90,7 +90,7 @@ function setup() {
 
   levelBtn = new Sprite(width*0.85, height*0.85, 200, 100, 'n');
   levelBtn.textSize = 28;
-  levelBtn.text = 'Next';
+  
   levelBtn.color = 'lime';
   levelBtn.visible = false;
 
@@ -169,7 +169,8 @@ function draw() {
   if (balls.visible){
     if (balls.length < 20){
       let ball = new balls.Sprite();
-      ball.img = ballImages[round(random(4))];
+      ball.color = color(random(255),random(255),random(255));
+      // ball.img = ballImages[round(random(4))];
     }
   } else {
     balls.removeAll();
@@ -277,13 +278,15 @@ function topBar(){
     }
     ///// stop game when time reaches 0 /////
     else {
-      text('Level '+level.l, width*0.15, height*0.07);
+      
       text('Time : 0', width*0.85, height*0.07);
       gameStart = false;
       if ((cardRemain > 0)&&(!levelBtn.visible)){
         loseGame();
       }
     }
+  } else {
+    text('Level '+level.l, width*0.15, height*0.85);
   }
 }
 
@@ -355,6 +358,7 @@ function createLevel(level){
 function winGame(){
   bunny.visible = true;
   balls.visible = true;
+  levelBtn.text = 'Next\nLevel '+(level.l+1);
   levelBtn.visible = true;
   levelBtn.collider = 's';
   endMessage.visible = true;
