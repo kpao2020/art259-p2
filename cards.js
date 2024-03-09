@@ -21,7 +21,7 @@ let score; // Keep track of score
 let cardRemain; // Keep track of remaining cards
 let balls, ballImages; // End Game animation
 let endMessage; // Display end game message
-let allowFlip = false; // Flip control state
+let allowFlip; // Flip control state
 let carrots, carrotImages=[]; // Start page animation
 let bunny, bunnyImage; // Win page image
 
@@ -93,31 +93,6 @@ function setup() {
   // no Stroke for cards
   noStroke();
 
-  // 0.5 row space for header
-  // createCanvas(space + level.col*(cardSize.w + space), (level.row + 0.5)*(cardSize.h + space));
-
-  startBtn = new Sprite(width*0.5, height*0.5, 150, 's');
-  startBtn.textSize = 28;
-  startBtn.text = 'START';
-  
-  carrots = new Group();
-  carrots.addAnimation('wiggle', carrotImages[0], carrotImages[1]);
-  carrots.scale = 0.1;
-  carrots.x = () => random(width*0.1, width*0.9);
-  carrots.y = () => random(height*0.2, height*0.9);
-  carrots.rotation = 0;
-  carrots.rotationlock = true;
-  carrots.visible = true;
-  carrots.collider = 'none';
-  carrots.life = 120;
-
-  bunny = new Sprite(width*0.5, height*0.85, 1, 'n');
-  bunny.img = bunnyImage;
-  bunny.visible = false;
-
-  gameStart = false;
-  levelTime = 60;
-  
   balls = new Group();
   balls.x = () => random(width*0.2, width*0.8);
   balls.y = () => random(height*0.5, height*0.8);
@@ -127,6 +102,29 @@ function setup() {
 	balls.speed = 2;
   balls.visible = false;
   balls.life = 30;
+
+  carrots = new Group();
+  carrots.addAnimation('wiggle', carrotImages[0], carrotImages[1]);
+  carrots.scale = 0.1;
+  carrots.x = () => random(width*0.1, width*0.9);
+  carrots.y = () => random(height*0.2, height*0.9);
+  carrots.rotation = 0;
+  carrots.rotationlock = true;
+  carrots.visible = true;
+  carrots.collider = 'n';
+  carrots.life = 120;
+
+  bunny = new Sprite(width*0.5, height*0.85, 1, 'n');
+  bunny.img = bunnyImage;
+  bunny.visible = false;
+
+  startBtn = new Sprite(width*0.5, height*0.5, 150, 's');
+  startBtn.textSize = 28;
+  startBtn.text = 'START';
+
+  gameStart = false;
+  allowFlip = false;
+  levelTime = 60;
   
   endMessage = new Sprite(width*0.5, height*0.3, 1, 'n');
   endMessage.color = 'lightyellow';

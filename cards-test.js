@@ -21,7 +21,7 @@ let score; // Keep track of score
 let cardRemain; // Keep track of remaining cards
 let balls, ballImages; // End Game animation
 let endMessage; // Display end game message
-let allowFlip = false; // Flip control state
+let allowFlip; // Flip control state
 let carrots, cImg1, cImg2; // Start page animation
 let bunny, bunnyImage; // Win page image
 
@@ -110,6 +110,7 @@ function setup() {
   bunny.visible = false;
 
   gameStart = false;
+  allowFlip = false;
   levelTime = 60;
   
   balls = new Group();
