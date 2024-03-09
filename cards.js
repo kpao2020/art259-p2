@@ -312,7 +312,7 @@ function loseGame(){
   endMessage.visible = true;
   endMessage.text = 'Try Again ?';
   setTimeout(() => {
-    gameStart = false;
+    // gameStart = false; // already set from topBar function
     endMessage.visible = false;
   }, 5000);
 }
@@ -325,6 +325,7 @@ function resetGame(){
   cardRemain = level.row * level.col;
   score = 0;
   allowFlip = false;
+  carrots.visible = true;
 }
 
 // Window resized function will run when "reload" after a browser window resize
