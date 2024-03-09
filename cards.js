@@ -121,10 +121,12 @@ function setup() {
   balls = new Group();
   balls.x = () => random(width*0.2, width*0.8);
   balls.y = () => random(height*0.5, height*0.8);
-  balls.d = 50;
+  balls.d = 5;
   balls.collider = 'none';
 	balls.direction = () => random(0, 360);
-	balls.speed = () => random(1, 5);
+	balls.speed = 2;
+  balls.visible = false;
+  balls.life = 30;
   
   endMessage = new Sprite(width*0.5, height*0.3, 1, 'n');
   endMessage.color = 'lightyellow';
@@ -143,6 +145,16 @@ function draw() {
   } else {
     carrots.removeAll();
   }
+
+  if (balls.visible){
+    if (balls.length < 20){
+      let ball = new balls.Sprite();
+      ball.img = ballImages[round(random(4))];
+    }
+  } else {
+    balls.removeAll();
+  }
+
   topBar(); // display header info
 
   ///// start the game and timer /////
@@ -290,21 +302,16 @@ function createLevel(level){
 
 function winGame(){
   bunny.visible = true;
-  balls.amount = 20;
-  for (let i = 0; i < balls.amount; i++){
-    balls[i].img = ballImages[i % ballImages.length];
-  }
-  
-  if (balls.cull(-100)){
-    new balls.Sprite();
-  } 
+  balls.visible = true;
+
   endMessage.visible = true;
   endMessage.text = 'You Win!\n\nYour Score : '+score;
 
   setTimeout(() => {
     bunny.visible = false;
-    gameStart = false;
+    balls.visible = false;
     endMessage.visible = false;
+    gameStart = false;
   }, 5000);
 }
 
