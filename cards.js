@@ -45,7 +45,7 @@ function preload() {
     loadImage('image/yellow50.png')];
 
   backImage = loadImage('image/bunnyBack.png');
-  bunnyImage = loadImage('image/youwinpost.png');
+  bunnyImage = loadImage('image/bunny300.png');
 }
 
 function setup() {
@@ -61,7 +61,6 @@ function setup() {
   let tempW = (width-((level.col+1)*space))/level.col;
   let tempH = (height-((level.row+1)*space))/(level.row+0.5);
 
-  console.log(tempW, tempH);
   cardSize = {
     w: tempW,
     h: tempH
@@ -104,13 +103,15 @@ function setup() {
   carrots = new Group();
   carrots.addAnimation('wiggle', carrotImages[0], carrotImages[1]);
   carrots.scale = 0.1;
-  carrots.x = () => random(width);
-  carrots.y = () => random(height);
+  carrots.x = () => random(width*0.1, width*0.9);
+  carrots.y = () => random(height*0.2, height*0.9);
   carrots.rotation = 0;
   carrots.rotationlock = true;
   carrots.visible = true;
+  carrots.collider = 'none';
+  carrots.life = 120;
 
-  bunny = new Sprite(width*0.5, height*0.8, 1, 'n');
+  bunny = new Sprite(width*0.5, height*0.85, 1, 'n');
   bunny.img = bunnyImage;
   bunny.visible = false;
 
@@ -135,6 +136,13 @@ function setup() {
 function draw() {
   clear();
   background('lightyellow');
+  if (carrots.visible){
+    if (carrots.length < 3){
+      new carrots.Sprite();
+    }
+  } else {
+    carrots.removeAll();
+  }
   topBar(); // display header info
 
   ///// start the game and timer /////
