@@ -15,11 +15,11 @@ let cardSize; // Card size based on device screen
 let space; // Spacer between cards
 let level; // level grid
 let gameTime, startTime, levelTime; // Timing variables
-let startBtn; // Start Button
+let startBtn, levelBtn; // Start Button
 let gameStart; // Game Start state = true or false
 let score; // Keep track of score
 let cardRemain; // Keep track of remaining cards
-let balls, ballImages; // End Game animation
+let balls, ballImages=[]; // End Game animation
 let endMessage; // Display end game message
 let allowFlip; // Flip control state
 let carrots, carrotImages=[]; // Start page animation
@@ -27,7 +27,7 @@ let bunny, bunnyImage; // Win page image
 
 
 function preload() {
-  for (let i = 1; i < 11; i++) {
+  for (let i = 1; i < 21; i++) {
     // Load all card images
     cardImages.push(loadImage('image/bunny'+i+'.png')); 
   }
@@ -37,58 +37,24 @@ function preload() {
     carrotImages.push(loadImage('image/carrotmove'+j+'.png')); 
   }
 
-  ballImages = [
-    loadImage('image/red50.png'),
-    loadImage('image/green50.png'),
-    loadImage('image/blue50.png'),
-    loadImage('image/orange50.png'),
-    loadImage('image/yellow50.png')];
+  for (let k = 1; k < 6; k++){
+  ballImages.push(loadImage('image/ball'+k+'.png'));
+  }
 
   backImage = loadImage('image/bunnyBack.png');
-  bunnyImage = loadImage('image/bunny300.png');
+  bunnyImage = loadImage('image/win.png');
 }
 
 function setup() {
   createCanvas(windowWidth*0.9, windowHeight*0.9);
-  // level contains row and column size
+  // each level contains row and column size
   // which adjust how many card images involved per level
   level = {
+    l: 1,
     row: 4,
     col: 5
   };
   space = 20;
-
-  let tempW = (width-((level.col+1)*space))/level.col;
-  let tempH = (height-((level.row+1)*space))/(level.row+0.5);
-
-  cardSize = {
-    w: tempW,
-    h: tempH
-  };
-  cardRemain = level.row * level.col;
-  
-  // Note: number of card images has to be 2x to 
-  //       fit full level images array
-  //       Example:
-  //          # of card images = 1 to 10
-  //          max card images = 10
-  //
-  //          # of level images = 2,4,6,8,10,12,14,16,18,20
-  //          max level images = 20
-  //
-  //       Easy Level
-  //          level.row = 2;
-  //          level.col = 2;
-  //          for (let x = 0; x < cardRemain; x++){
-  //            levelImages.push(cardImages[x % (cardRemain/2)]);
-  //          }
-  //
-  //  *** cardRemain/2 <= cardImages.length ***
-
-  for (let x = 0; x < cardRemain; x++){
-    levelImages.push(cardImages[x % cardImages.length]);
-  }
-  shuffle(levelImages, true);
 
   // no Stroke for cards
   noStroke();
@@ -122,9 +88,14 @@ function setup() {
   startBtn.textSize = 28;
   startBtn.text = 'START';
 
+  levelBtn = new Sprite(width*0.85, height*0.85, 200, 100, 'n');
+  levelBtn.textSize = 28;
+  levelBtn.text = 'Next';
+  levelBtn.color = 'lime';
+  levelBtn.visible = false;
+
   gameStart = false;
   allowFlip = false;
-  levelTime = 60;
   
   endMessage = new Sprite(width*0.5, height*0.3, 1, 'n');
   endMessage.color = 'lightyellow';
@@ -136,6 +107,13 @@ function setup() {
 function draw() {
   clear();
   background('lightyellow');
+
+  if (keyIsDown(76)){
+    levelBtn.visible = true;
+    levelBtn.collider = 's';
+  } 
+
+  // Start page animation
   if (carrots.visible){
     if (carrots.length < 3){
       new carrots.Sprite();
@@ -144,6 +122,50 @@ function draw() {
     carrots.removeAll();
   }
 
+  topBar(); // display header info
+
+  ///// start the game and timer /////
+  if (startBtn.mouse.hovering()){
+    startBtn.color = 'yellow';
+    cursor(HAND);
+  } else {
+    startBtn.color = 'lime';
+    cursor(ARROW);
+  }
+  
+  if (startBtn.mouse.presses()) {
+    gameStart = true;
+    allowFlip = true;
+    carrots.visible = false;
+    startBtn.visible = false;
+    startBtn.collider = 'n';
+    createLevel(level);
+    startTime = millis();
+  }
+
+  ///// Next Level /////
+  if (levelBtn.mouse.hovering()){
+    levelBtn.color = 'yellow';
+    cursor(HAND);
+  } else {
+    levelBtn.color = 'lime';
+    cursor(ARROW);
+  }
+
+  if (levelBtn.mouse.presses()){
+    gameStart = true;
+    allowFlip = true;
+    carrots.visible = false;
+    levelBtn.visible = false;
+    levelBtn.collider = 'n';
+    if (level.l < 3){
+      level.l++;
+    }
+    createLevel(level);
+    startTime = millis();
+  }
+
+  // Winning animation
   if (balls.visible){
     if (balls.length < 20){
       let ball = new balls.Sprite();
@@ -151,27 +173,6 @@ function draw() {
     }
   } else {
     balls.removeAll();
-  }
-
-  topBar(); // display header info
-
-  ///// start the game and timer /////
-  if (startBtn.mouse.hovering()){
-      startBtn.color = 'yellow';
-      cursor(HAND);
-  } else {
-      startBtn.color = 'lime';
-      cursor(ARROW);
-  }
-  
-  if (startBtn.mouse.presses()) {
-      gameStart = true;
-      allowFlip = true;
-      carrots.visible = false;
-      startTime = millis();
-      startBtn.visible = false;
-      startBtn.collider = 'n';
-      createLevel(level);
   }
 
   // Game Start section
@@ -267,19 +268,19 @@ function topBar(){
 
   ///// Start game time when click Start /////
   if (gameStart){
-    
-    text('Cards: '+cardRemain.toString(),width*0.15,height*0.07);
     text('Score: '+score.toString(),width*0.5,height*0.07);
 
     ///// prevent time to run over 0 /////
     if (gameTime > 0) {
+      text('Cards: '+cardRemain.toString(), width*0.15, height*0.07);
       text('Time : '+gameTime.toString(), width*0.85, height*0.07);
     }
     ///// stop game when time reaches 0 /////
     else {
-      text('Time : 0',width*0.85,height*0.07);
+      text('Level '+level.l, width*0.15, height*0.07);
+      text('Time : 0', width*0.85, height*0.07);
       gameStart = false;
-      if (cardRemain > 0){
+      if ((cardRemain > 0)&&(!levelBtn.visible)){
         loseGame();
       }
     }
@@ -287,6 +288,59 @@ function topBar(){
 }
 
 function createLevel(level){
+  cards = [];
+  levelImages = [];
+  if (level.l == 1){
+    level.row = 4;
+    level.col = 5;
+    levelTime = 60;
+    for (let x = 0; x < 20; x++){
+      levelImages.push(cardImages[x % 10]);
+    }
+  } else if (level.l == 2){
+    level.row = 5;
+    level.col = 6;
+    levelTime = 120;
+    for (let x = 0; x < 30; x++){
+      levelImages.push(cardImages[x % 15]);
+    } 
+  } else if (level.l == 3){
+    level.row = 5;
+    level.col = 8;
+    levelTime = 300;
+    for (let x = 0; x < 40; x++){
+      levelImages.push(cardImages[x % 20]);
+    }
+  }
+
+  let tempW = (width-((level.col+1)*space))/level.col;
+  let tempH = (height-((level.row+1)*space))/(level.row+0.5);
+
+  cardSize = {
+    w: tempW,
+    h: tempH
+  };
+  
+  cardRemain = level.row * level.col;
+  // Note: number of card images has to be 2x to 
+  //       fit full level images array
+  //       Example:
+  //          # of card images = 1 to 10
+  //          max card images = 10
+  //
+  //          # of level images = 2,4,6,8,10,12,14,16,18,20
+  //          max level images = 20
+  //
+  //       Easy Level
+  //          level.row = 2;
+  //          level.col = 2;
+  //          for (let x = 0; x < cardRemain; x++){
+  //            levelImages.push(cardImages[x % (cardRemain/2)]);
+  //          }
+  //
+  //  *** cardRemain/2 <= cardImages.length ***
+
+  shuffle(levelImages, true);
     // Create new card objects
     for (let i = 0; i < level.col; i++) {
       for (let j = 0; j < level.row; j++) {
@@ -301,7 +355,8 @@ function createLevel(level){
 function winGame(){
   bunny.visible = true;
   balls.visible = true;
-
+  levelBtn.visible = true;
+  levelBtn.collider = 's';
   endMessage.visible = true;
   endMessage.text = 'You Win!\n\nYour Score : '+score;
 
@@ -315,7 +370,8 @@ function winGame(){
 
 function loseGame(){
   endMessage.visible = true;
-  endMessage.text = 'Try Again ?';
+  endMessage.text = 'Replay?';
+  startBtn.text = 'Restart';
   setTimeout(() => {
     // gameStart = false; // already set from topBar function
     endMessage.visible = false;
@@ -323,14 +379,18 @@ function loseGame(){
 }
 
 function resetGame(){
-  startBtn.visible = true;
-  startBtn.collider = 's';
-  shuffle(levelImages, true);
-  cards=[];
-  cardRemain = level.row * level.col;
+  if (levelBtn.visible){
+    startBtn.visible = false;
+    startBtn.collider = 'n';
+  } else {
+    shuffle(levelImages, true);
+    cardRemain = level.row * level.col;
+    carrots.visible = true;
+    startBtn.visible = true;
+    startBtn.collider = 's';
+  }
   score = 0;
   allowFlip = false;
-  carrots.visible = true;
 }
 
 // Window resized function will run when "reload" after a browser window resize
