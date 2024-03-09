@@ -21,8 +21,8 @@ let score; // Keep track of score
 let cardRemain; // Keep track of remaining cards
 let balls, ballImages; // End Game animation
 let endMessage; // Display end game message
-let allowFlip = false; // Flip control state
-let carrots, carrotImages=[]; // Start page animation
+let allowFlip; // Flip control state
+let carrots, cImg1, cImg2; // Start page animation
 let bunny, bunnyImage; // Win page image
 
 
@@ -30,11 +30,6 @@ function preload() {
   for (let i = 1; i < 11; i++) {
     // Load all card images
     cardImages.push(loadImage('image/bunny'+i+'.png')); 
-  }
-
-  for (let j = 1; j < 3; j++) {
-    // load carrot animation images
-    carrotImages.push(loadImage('image/carrotmove'+j+'.png')); 
   }
 
   ballImages = [
@@ -46,6 +41,8 @@ function preload() {
 
   backImage = loadImage('image/bunnyBack.png');
   bunnyImage = loadImage('image/bunny300.png');
+  cImg1 = loadImage('image/carrotmove1.png');
+  cImg2 = loadImage('image/carrotmove2.png');
 }
 
 function setup() {
@@ -98,7 +95,7 @@ function setup() {
   startBtn.text = 'START';
   
   carrots = new Group();
-  carrots.addAnimation('wiggle', carrotImages[0], carrotImages[1]);
+  carrots.img = cImg1;
   carrots.scale = 0.1;
   carrots.x = () => random(width*0.2, width*0.8);
   carrots.y = () => random(height*0.2, height*0.8);
@@ -108,11 +105,12 @@ function setup() {
   carrots.collider = 'none';
   carrots.life = 300; // every 5 sec carrots will reappear in different spots
 
-  bunny = new Sprite(width*0.5, height*0.8, 1, 'n');
+  bunny = new Sprite(width*0.5, height*0.85, 1, 'n');
   bunny.img = bunnyImage;
   bunny.visible = false;
 
   gameStart = false;
+  allowFlip = false;
   levelTime = 60;
   
   balls = new Group();
@@ -120,9 +118,12 @@ function setup() {
   balls.y = () => random(height*0.5, height*0.8);
   balls.d = 50;
   balls.collider = 'none';
-	balls.direction = () => random(0, 360);
-	balls.speed = () => random(1, 5);
-  balls.life = 120; // life is 2 sec
+  balls.img = () => random(ballImages);
+  balls.visible = false;
+  balls.life = 30; // life is 2 sec
+	// balls.direction = () => random(0, 360);
+	// balls.speed = () => random(1, 5);
+  
   
   endMessage = new Sprite(width*0.5, height*0.3, 1, 'n');
   endMessage.color = 'lightyellow';
@@ -141,6 +142,15 @@ function draw() {
   } else {
     carrots.removeAll();
   }
+
+  if (balls.visible){
+    if (balls.length < 20){
+      new balls.Sprite();
+    }
+  } else {
+    balls.removeAll();
+  }
+
   topBar(); // display header info
 
   ///// start the game and timer /////
@@ -155,7 +165,7 @@ function draw() {
   if (startBtn.mouse.presses()) {
       gameStart = true;
       allowFlip = true;
-      endMessage.visible = false;
+      // endMessage.visible = false;
       carrots.visible = false;
       startTime = millis();
       startBtn.visible = false;
@@ -288,21 +298,22 @@ function createLevel(level){
 }
 
 function winGame(){
-  
-  balls.amount = 20;
-  for (let i = 0; i < balls.amount; i++){
-    balls[i].img = ballImages[i % ballImages.length];
-  }
-  
-  if (balls.cull(-50)){
-    new balls.Sprite();
-  } 
+  bunny.visible = true;
+  balls.visible = true;
+  // balls.amount = 20;
+  // for (let i = 0; i < balls.amount; i++){
+  //   balls[i].img = ballImages[i % ballImages.length];
+  // }
+  // if (balls.cull(-50)){
+  //   new balls.Sprite();
+  // } 
   endMessage.visible = true;
   endMessage.text = 'You Win!\n\nYour Score : '+score;
-  bunny.visible = true;
+  
 
   setTimeout(() => {
     bunny.visible = false;
+    balls.visible = false;
     gameStart = false;
     endMessage.visible = false;
   }, 5000);
