@@ -47,8 +47,8 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth*0.9, windowHeight*0.9);
-  // each level contains row and column size
-  // which adjust how many card images involved per level
+
+  // initialize level 1 parameters
   level = {
     l: 1,
     row: 4,
@@ -60,8 +60,8 @@ function setup() {
   noStroke();
 
   balls = new Group();
-  balls.x = width*0.58;//() => random(width*0.2, width*0.8);
-  balls.y = height*0.7;//() => random(height*0.5, height*0.8);
+  balls.x = width*0.58; // animation test: ball.x = () => random(width*0.2, width*0.8);
+  balls.y = height*0.7; // animation test: ball.y = () => random(height*0.5, height*0.8);
   balls.d = 5;
   balls.collider = 'none';
 	balls.direction = () => random(0, 360);
@@ -111,6 +111,7 @@ function draw() {
   if (keyIsDown(76)){
     levelBtn.visible = true;
     levelBtn.collider = 's';
+    levelBtn.text = 'Secret Skip'
   } 
 
   // Start page animation
@@ -170,7 +171,7 @@ function draw() {
     if (balls.length < 20){
       let ball = new balls.Sprite();
       ball.color = color(random(255),random(255),random(255));
-      // ball.img = ballImages[round(random(4))];
+      // animation test: ball.img = ballImages[round(random(4))];
     }
   } else {
     balls.removeAll();
@@ -293,29 +294,33 @@ function topBar(){
 function createLevel(level){
   cards = [];
   levelImages = [];
+
+  // each level contains row and column size
+  // which adjust how many card images involved per level
   if (level.l == 1){
     level.row = 4;
     level.col = 5;
     levelTime = 60;
-    for (let x = 0; x < 20; x++){
-      levelImages.push(cardImages[x % 10]);
-    }
+    // for (let x = 0; x < 20; x++){
+    //   levelImages.push(cardImages[x % 10]);
+    // }
   } else if (level.l == 2){
     level.row = 5;
     level.col = 6;
     levelTime = 120;
-    for (let x = 0; x < 30; x++){
-      levelImages.push(cardImages[x % 15]);
-    } 
+    // for (let x = 0; x < 30; x++){
+    //   levelImages.push(cardImages[x % 15]);
+    // } 
   } else if (level.l == 3){
     level.row = 5;
     level.col = 8;
     levelTime = 300;
-    for (let x = 0; x < 40; x++){
-      levelImages.push(cardImages[x % 20]);
-    }
+    // for (let x = 0; x < 40; x++){
+    //   levelImages.push(cardImages[x % 20]);
+    // }
   }
 
+  // Adjust card size for each level
   let tempW = (width-((level.col+1)*space))/level.col;
   let tempH = (height-((level.row+1)*space))/(level.row+0.5);
 
@@ -324,7 +329,6 @@ function createLevel(level){
     h: tempH
   };
   
-  cardRemain = level.row * level.col;
   // Note: number of card images has to be 2x to 
   //       fit full level images array
   //       Example:
@@ -342,6 +346,10 @@ function createLevel(level){
   //          }
   //
   //  *** cardRemain/2 <= cardImages.length ***
+  cardRemain = level.row * level.col;
+  for (let x = 0; x < cardRemain; x++){
+    levelImages.push(cardImages[x % (cardRemain/2)]);
+  }
 
   shuffle(levelImages, true);
     // Create new card objects
@@ -358,7 +366,11 @@ function createLevel(level){
 function winGame(){
   bunny.visible = true;
   balls.visible = true;
-  levelBtn.text = 'Next\nLevel '+(level.l+1);
+  if (level.l < 3){
+    levelBtn.text = 'Next\nLevel '+(level.l+1);
+  } else {
+    levelBtn.text = 'Replay\nLevel '+(level.l);
+  }
   levelBtn.visible = true;
   levelBtn.collider = 's';
   endMessage.visible = true;
@@ -387,14 +399,16 @@ function resetGame(){
     startBtn.visible = false;
     startBtn.collider = 'n';
   } else {
-    shuffle(levelImages, true);
-    cardRemain = level.row * level.col;
+    // shuffle(levelImages, true);
+    // console.log('resetGame shuffle');
+    // cardRemain = level.row * level.col;
     carrots.visible = true;
     startBtn.visible = true;
     startBtn.collider = 's';
   }
   score = 0;
   allowFlip = false;
+  flipCards = [];
 }
 
 // Window resized function will run when "reload" after a browser window resize
