@@ -24,7 +24,7 @@ let endMessage; // Display end game message
 let allowFlip; // Flip control state
 let carrots, carrotImages=[]; // Start page animation
 let bunny, bunnyImage; // Win page image
-
+let sounds;
 
 function preload() {
   for (let i = 1; i < 21; i++) {
@@ -37,16 +37,34 @@ function preload() {
     carrotImages.push(loadImage('image/carrotmove'+j+'.png')); 
   }
 
-  for (let k = 1; k < 6; k++){
-  ballImages.push(loadImage('image/ball'+k+'.png'));
-  }
+  // for (let k = 1; k < 6; k++){
+  //   ballImages.push(loadImage('image/ball'+k+'.png'));
+  // }
 
   backImage = loadImage('image/bunnyBack.png');
   bunnyImage = loadImage('image/win.png');
+
+  sounds = [
+    loadSound('sound/achieve.wav'),
+    loadSound('sound/bonus.wav'),
+    loadSound('sound/bonus2.wav'),
+    loadSound('sound/exp-inc.wav'),
+    loadSound('sound/hp-recharge.wav'),
+    loadSound('sound/level-complete.wav'),
+    loadSound('sound/level-complete2.wav'),
+    loadSound('sound/level-music.wav'),
+    loadSound('sound/lose.wav'),
+    loadSound('sound/p-boost.wav'),
+    loadSound('sound/treasure.wav'),
+    loadSound('sound/unlock.wav'),
+    loadSound('sound/win.wav'),
+    loadSound('sound/win2.wav')
+  ];
+
 }
 
 function setup() {
-  createCanvas(windowWidth*0.9, windowHeight*0.9);
+  createCanvas(windowWidth*0.95, windowHeight*0.95);
 
   // initialize level 1 parameters
   level = {
@@ -60,14 +78,14 @@ function setup() {
   noStroke();
 
   balls = new Group();
-  balls.x = width*0.58; // animation test: ball.x = () => random(width*0.2, width*0.8);
-  balls.y = height*0.7; // animation test: ball.y = () => random(height*0.5, height*0.8);
+  balls.x = width*0.54; // animation test: ball.x = () => random(width*0.2, width*0.8);
+  balls.y = height*0.72; // animation test: ball.y = () => random(height*0.5, height*0.8);
   balls.d = 5;
   balls.collider = 'none';
 	balls.direction = () => random(0, 360);
 	balls.speed = 2;
   balls.visible = false;
-  balls.life = 100;
+  balls.life = 120; // 2 seconds
 
   carrots = new Group();
   carrots.addAnimation('wiggle', carrotImages[0], carrotImages[1]);
@@ -78,7 +96,7 @@ function setup() {
   carrots.rotationlock = true;
   carrots.visible = true;
   carrots.collider = 'n';
-  carrots.life = 120;
+  carrots.life = 120; // 2 seconds
 
   bunny = new Sprite(width*0.5, height*0.85, 1, 'n');
   bunny.img = bunnyImage;
@@ -108,10 +126,14 @@ function draw() {
   clear();
   background('lightyellow');
 
+  // Skip level: keyCode 76 = 'L' key
   if (keyIsDown(76)){
+    sounds[11].play();
+    console.log('l key sound 11');
     levelBtn.visible = true;
     levelBtn.collider = 's';
     levelBtn.text = 'Secret Skip'
+    flipCards = []; // avoid cardRemain error
   } 
 
   // Start page animation
@@ -135,8 +157,11 @@ function draw() {
   }
   
   if (startBtn.mouse.presses()) {
+    sounds[9].play();
+    console.log('startBtn sound 9');
     gameStart = true;
     allowFlip = true;
+    endMessage.visible = false;
     carrots.visible = false;
     startBtn.visible = false;
     startBtn.collider = 'n';
@@ -154,8 +179,13 @@ function draw() {
   }
 
   if (levelBtn.mouse.presses()){
+    sounds[1].play();
+    console.log('lBtn sound 1');
     gameStart = true;
     allowFlip = true;
+    bunny.visible = false; 
+    balls.visible = false; 
+    endMessage.visible = false;
     carrots.visible = false;
     levelBtn.visible = false;
     levelBtn.collider = 'n';
@@ -179,14 +209,9 @@ function draw() {
 
   // Game Start section
   if (gameStart){
-    // Winning condition => no more cards left
-    if (cardRemain == 0){
-      winGame();
-    } else {
-      fill('black'); // set background color of card to black
-      for (let card of cards) {
-        card.display();
-      }
+    fill('black'); // set background color of card to black
+    for (let card of cards) {
+      card.display();
     }
   } else {
     resetGame();
@@ -194,34 +219,36 @@ function draw() {
 }
 
 function mousePressed() {
-  if (gameStart){ // only allow flip when game starts
-    if (allowFlip){
-      for (let card of cards) {
-        if (card.hovers(mouseX, mouseY) && !card.flipped) {
-          card.flip();
-          cardRemain--;
-          flipCards.push(card);
-          if (flipCards.length === 2) {
-            if (flipCards[0].img === flipCards[1].img) {
-              // Match section
-              // console.log('match');
-              score += 100;
+  if (allowFlip){
+    for (let card of cards) {
+      if (card.hovers(mouseX, mouseY) && !card.flipped) {
+        card.flip();
+        sounds[0].play();
+        console.log('flip 1st card sound 0');
+        cardRemain--;
+        flipCards.push(card);
+        if (flipCards.length === 2) {
+          if (flipCards[0].img === flipCards[1].img) {
+            // Match section
+            // console.log('match');
+            score += 100;
+            sounds[10].play();
+            console.log('match sound 10');
+            flipCards = [];
+          } else {
+            // Not a match, flip back after a delay of 0.5 second
+            // console.log('not match');
+            allowFlip = false;
+            setTimeout(() => {
+              flipCards[0].flip();
+              flipCards[1].flip();
+              cardRemain += 2;
               flipCards = [];
-            } else {
-              // Not a match, flip back after a delay of 0.5 second
-              // console.log('not match');
-              allowFlip = false;
-              setTimeout(() => {
-                flipCards[0].flip();
-                flipCards[1].flip();
-                cardRemain += 2;
-                flipCards = [];
-                if (score > 0){
-                  score -= 50;
-                }
-                allowFlip = true;
-              }, 500);
-            }
+              if (score > 0){
+                score -= 50;
+              }
+              allowFlip = true;
+            }, 500);
           }
         }
       }
@@ -276,14 +303,23 @@ function topBar(){
     if (gameTime > 0) {
       text('Cards: '+cardRemain.toString(), width*0.15, height*0.07);
       text('Time : '+gameTime.toString(), width*0.85, height*0.07);
+
+      // check winning condition
+      if (cardRemain == 0){
+        winGame();
+        sounds[2].play();
+        console.log('win sound 2');
+        gameStart = false;
+      }
     }
     ///// stop game when time reaches 0 /////
     else {
-      
       text('Time : 0', width*0.85, height*0.07);
       gameStart = false;
       if ((cardRemain > 0)&&(!levelBtn.visible)){
         loseGame();
+        sounds[8].play();
+        console.log('lose sound 8');
       }
     }
   } else {
@@ -301,23 +337,14 @@ function createLevel(level){
     level.row = 4;
     level.col = 5;
     levelTime = 60;
-    // for (let x = 0; x < 20; x++){
-    //   levelImages.push(cardImages[x % 10]);
-    // }
   } else if (level.l == 2){
     level.row = 5;
     level.col = 6;
     levelTime = 120;
-    // for (let x = 0; x < 30; x++){
-    //   levelImages.push(cardImages[x % 15]);
-    // } 
   } else if (level.l == 3){
     level.row = 5;
     level.col = 8;
     levelTime = 300;
-    // for (let x = 0; x < 40; x++){
-    //   levelImages.push(cardImages[x % 20]);
-    // }
   }
 
   // Adjust card size for each level
@@ -375,23 +402,12 @@ function winGame(){
   levelBtn.collider = 's';
   endMessage.visible = true;
   endMessage.text = 'You Win!\n\nYour Score : '+score;
-
-  setTimeout(() => {
-    bunny.visible = false;
-    balls.visible = false;
-    endMessage.visible = false;
-    gameStart = false;
-  }, 5000);
 }
 
 function loseGame(){
   endMessage.visible = true;
   endMessage.text = 'Replay?';
   startBtn.text = 'Restart';
-  setTimeout(() => {
-    // gameStart = false; // already set from topBar function
-    endMessage.visible = false;
-  }, 5000);
 }
 
 function resetGame(){
@@ -399,9 +415,6 @@ function resetGame(){
     startBtn.visible = false;
     startBtn.collider = 'n';
   } else {
-    // shuffle(levelImages, true);
-    // console.log('resetGame shuffle');
-    // cardRemain = level.row * level.col;
     carrots.visible = true;
     startBtn.visible = true;
     startBtn.collider = 's';
