@@ -23,12 +23,12 @@ let balls, ballImages=[]; // End Game animation
 let endMessage; // Display end game message
 let allowFlip; // Flip control state
 let carrots, carrotImages=[]; // Start page animation
-let bunny, bunnyImage; // Win page image
+let bunny, winImage, loseImage; // Win/Lose page image
 let sounds;
 
 function preload() {
-  for (let i = 1; i < 21; i++) {
-    // Load all card images
+  for (let i = 1; i < 27; i++) {
+    // Load all card images - total 26
     cardImages.push(loadImage('image/bunny'+i+'.png')); 
   }
 
@@ -42,7 +42,8 @@ function preload() {
   // }
 
   backImage = loadImage('image/bunnyBack.png');
-  bunnyImage = loadImage('image/win.png');
+  winImage = loadImage('image/win.png');
+  loseImage = loadImage('image/lose.png');
 
   sounds = [
     loadSound('sound/achieve.wav'),
@@ -99,7 +100,7 @@ function setup() {
   carrots.life = 120; // 2 seconds
 
   bunny = new Sprite(width*0.5, height*0.85, 1, 'n');
-  bunny.img = bunnyImage;
+  bunny.img = winImage;
   bunny.visible = false;
 
   startBtn = new Sprite(width*0.5, height*0.5, 150, 's');
