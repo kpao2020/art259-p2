@@ -24,7 +24,7 @@ let endMessage; // Display end game message
 let allowFlip; // Flip control state
 let carrots, carrotImages=[]; // Start page animation
 let bunny, bunnyImage; // Win page image
-
+let sounds;
 
 function preload() {
   for (let i = 1; i < 21; i++) {
@@ -37,12 +37,30 @@ function preload() {
     carrotImages.push(loadImage('image/carrotmove'+j+'.png')); 
   }
 
-  for (let k = 1; k < 6; k++){
-  ballImages.push(loadImage('image/ball'+k+'.png'));
-  }
+  // for (let k = 1; k < 6; k++){
+  //   ballImages.push(loadImage('image/ball'+k+'.png'));
+  // }
 
   backImage = loadImage('image/bunnyBack.png');
   bunnyImage = loadImage('image/win.png');
+
+  sounds = [
+    loadSound('sound/achieve.wav'),
+    loadSound('sound/bonus.wav'),
+    loadSound('sound/bonus2.wav'),
+    loadSound('sound/exp-inc.wav'),
+    loadSound('sound/hp-recharge.wav'),
+    loadSound('sound/level-complete.wav'),
+    loadSound('sound/level-complete2.wav'),
+    loadSound('sound/level-music.wav'),
+    loadSound('sound/lose.wav'),
+    loadSound('sound/p-boost.wav'),
+    loadSound('sound/treasure.wav'),
+    loadSound('sound/unlock.wav'),
+    loadSound('sound/win.wav'),
+    loadSound('sound/win2.wav')
+  ];
+
 }
 
 function setup() {
@@ -108,14 +126,14 @@ function draw() {
   clear();
   background('lightyellow');
 
-  // Skip level
+  // Skip level: keyCode 76 = 'L' key
   if (keyIsDown(76)){
+    sounds[11].play();
+    console.log('l key sound 11');
     levelBtn.visible = true;
     levelBtn.collider = 's';
     levelBtn.text = 'Secret Skip'
     flipCards = []; // avoid cardRemain error
-    bunny.visible = true;
-    balls.visible = true;
   } 
 
   // Start page animation
@@ -139,6 +157,8 @@ function draw() {
   }
   
   if (startBtn.mouse.presses()) {
+    sounds[9].play();
+    console.log('startBtn sound 9');
     gameStart = true;
     allowFlip = true;
     endMessage.visible = false;
@@ -159,6 +179,8 @@ function draw() {
   }
 
   if (levelBtn.mouse.presses()){
+    sounds[1].play();
+    console.log('lBtn sound 1');
     gameStart = true;
     allowFlip = true;
     bunny.visible = false; 
@@ -201,6 +223,8 @@ function mousePressed() {
     for (let card of cards) {
       if (card.hovers(mouseX, mouseY) && !card.flipped) {
         card.flip();
+        sounds[0].play();
+        console.log('flip 1st card sound 0');
         cardRemain--;
         flipCards.push(card);
         if (flipCards.length === 2) {
@@ -208,6 +232,8 @@ function mousePressed() {
             // Match section
             // console.log('match');
             score += 100;
+            sounds[10].play();
+            console.log('match sound 10');
             flipCards = [];
           } else {
             // Not a match, flip back after a delay of 0.5 second
@@ -281,6 +307,8 @@ function topBar(){
       // check winning condition
       if (cardRemain == 0){
         winGame();
+        sounds[2].play();
+        console.log('win sound 2');
         gameStart = false;
       }
     }
@@ -290,6 +318,8 @@ function topBar(){
       gameStart = false;
       if ((cardRemain > 0)&&(!levelBtn.visible)){
         loseGame();
+        sounds[8].play();
+        console.log('lose sound 8');
       }
     }
   } else {
