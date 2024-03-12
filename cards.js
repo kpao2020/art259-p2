@@ -46,7 +46,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(windowWidth*0.9, windowHeight*0.9);
+  createCanvas(windowWidth*0.95, windowHeight*0.95);
 
   // initialize level 1 parameters
   level = {
@@ -60,7 +60,7 @@ function setup() {
   noStroke();
 
   balls = new Group();
-  balls.x = width*0.57; // animation test: ball.x = () => random(width*0.2, width*0.8);
+  balls.x = width*0.54; // animation test: ball.x = () => random(width*0.2, width*0.8);
   balls.y = height*0.72; // animation test: ball.y = () => random(height*0.5, height*0.8);
   balls.d = 5;
   balls.collider = 'none';
@@ -114,6 +114,8 @@ function draw() {
     levelBtn.collider = 's';
     levelBtn.text = 'Secret Skip'
     flipCards = []; // avoid cardRemain error
+    bunny.visible = true;
+    balls.visible = true;
   } 
 
   // Start page animation
