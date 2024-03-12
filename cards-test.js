@@ -157,7 +157,6 @@ function draw() {
   if (levelBtn.mouse.presses()){
     gameStart = true;
     allowFlip = true;
-    console.log(cardRemain);
     bunny.visible = false; // this only applies to winning 
     balls.visible = false; // this only applies to winning
     endMessage.visible = false;
@@ -311,21 +310,21 @@ function createLevel(level){
   if (level.l == 1){
     level.row = 4;
     level.col = 5;
-    levelTime = 60;
+    levelTime = 6;
     // for (let x = 0; x < 20; x++){
     //   levelImages.push(cardImages[x % 10]);
     // }
   } else if (level.l == 2){
     level.row = 5;
     level.col = 6;
-    levelTime = 120;
+    levelTime = 12;
     // for (let x = 0; x < 30; x++){
     //   levelImages.push(cardImages[x % 15]);
     // } 
   } else if (level.l == 3){
     level.row = 5;
     level.col = 8;
-    levelTime = 300;
+    levelTime = 30;
     // for (let x = 0; x < 40; x++){
     //   levelImages.push(cardImages[x % 20]);
     // }

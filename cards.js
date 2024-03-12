@@ -60,14 +60,14 @@ function setup() {
   noStroke();
 
   balls = new Group();
-  balls.x = width*0.58; // animation test: ball.x = () => random(width*0.2, width*0.8);
-  balls.y = height*0.7; // animation test: ball.y = () => random(height*0.5, height*0.8);
+  balls.x = width*0.57; // animation test: ball.x = () => random(width*0.2, width*0.8);
+  balls.y = height*0.72; // animation test: ball.y = () => random(height*0.5, height*0.8);
   balls.d = 5;
   balls.collider = 'none';
 	balls.direction = () => random(0, 360);
 	balls.speed = 2;
   balls.visible = false;
-  balls.life = 100;
+  balls.life = 120; // 2 seconds
 
   carrots = new Group();
   carrots.addAnimation('wiggle', carrotImages[0], carrotImages[1]);
@@ -78,7 +78,7 @@ function setup() {
   carrots.rotationlock = true;
   carrots.visible = true;
   carrots.collider = 'n';
-  carrots.life = 120;
+  carrots.life = 120; // 2 seconds
 
   bunny = new Sprite(width*0.5, height*0.85, 1, 'n');
   bunny.img = bunnyImage;
@@ -108,10 +108,12 @@ function draw() {
   clear();
   background('lightyellow');
 
+  // Skip level
   if (keyIsDown(76)){
     levelBtn.visible = true;
     levelBtn.collider = 's';
     levelBtn.text = 'Secret Skip'
+    flipCards = []; // avoid cardRemain error
   } 
 
   // Start page animation
@@ -157,7 +159,6 @@ function draw() {
   if (levelBtn.mouse.presses()){
     gameStart = true;
     allowFlip = true;
-    console.log(cardRemain);
     bunny.visible = false; 
     balls.visible = false; 
     endMessage.visible = false;
