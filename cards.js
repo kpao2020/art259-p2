@@ -137,6 +137,7 @@ function draw() {
   if (startBtn.mouse.presses()) {
     gameStart = true;
     allowFlip = true;
+    endMessage.visible = false;
     carrots.visible = false;
     startBtn.visible = false;
     startBtn.collider = 'n';
@@ -156,6 +157,10 @@ function draw() {
   if (levelBtn.mouse.presses()){
     gameStart = true;
     allowFlip = true;
+    console.log(cardRemain);
+    bunny.visible = false; 
+    balls.visible = false; 
+    endMessage.visible = false;
     carrots.visible = false;
     levelBtn.visible = false;
     levelBtn.collider = 'n';
@@ -179,14 +184,9 @@ function draw() {
 
   // Game Start section
   if (gameStart){
-    // Winning condition => no more cards left
-    if (cardRemain == 0){
-      winGame();
-    } else {
-      fill('black'); // set background color of card to black
-      for (let card of cards) {
-        card.display();
-      }
+    fill('black'); // set background color of card to black
+    for (let card of cards) {
+      card.display();
     }
   } else {
     resetGame();
@@ -194,34 +194,32 @@ function draw() {
 }
 
 function mousePressed() {
-  if (gameStart){ // only allow flip when game starts
-    if (allowFlip){
-      for (let card of cards) {
-        if (card.hovers(mouseX, mouseY) && !card.flipped) {
-          card.flip();
-          cardRemain--;
-          flipCards.push(card);
-          if (flipCards.length === 2) {
-            if (flipCards[0].img === flipCards[1].img) {
-              // Match section
-              // console.log('match');
-              score += 100;
+  if (allowFlip){
+    for (let card of cards) {
+      if (card.hovers(mouseX, mouseY) && !card.flipped) {
+        card.flip();
+        cardRemain--;
+        flipCards.push(card);
+        if (flipCards.length === 2) {
+          if (flipCards[0].img === flipCards[1].img) {
+            // Match section
+            // console.log('match');
+            score += 100;
+            flipCards = [];
+          } else {
+            // Not a match, flip back after a delay of 0.5 second
+            // console.log('not match');
+            allowFlip = false;
+            setTimeout(() => {
+              flipCards[0].flip();
+              flipCards[1].flip();
+              cardRemain += 2;
               flipCards = [];
-            } else {
-              // Not a match, flip back after a delay of 0.5 second
-              // console.log('not match');
-              allowFlip = false;
-              setTimeout(() => {
-                flipCards[0].flip();
-                flipCards[1].flip();
-                cardRemain += 2;
-                flipCards = [];
-                if (score > 0){
-                  score -= 50;
-                }
-                allowFlip = true;
-              }, 500);
-            }
+              if (score > 0){
+                score -= 50;
+              }
+              allowFlip = true;
+            }, 500);
           }
         }
       }
@@ -276,10 +274,15 @@ function topBar(){
     if (gameTime > 0) {
       text('Cards: '+cardRemain.toString(), width*0.15, height*0.07);
       text('Time : '+gameTime.toString(), width*0.85, height*0.07);
+
+      // check winning condition
+      if (cardRemain == 0){
+        winGame();
+        gameStart = false;
+      }
     }
     ///// stop game when time reaches 0 /////
     else {
-      
       text('Time : 0', width*0.85, height*0.07);
       gameStart = false;
       if ((cardRemain > 0)&&(!levelBtn.visible)){
@@ -301,23 +304,14 @@ function createLevel(level){
     level.row = 4;
     level.col = 5;
     levelTime = 60;
-    // for (let x = 0; x < 20; x++){
-    //   levelImages.push(cardImages[x % 10]);
-    // }
   } else if (level.l == 2){
     level.row = 5;
     level.col = 6;
     levelTime = 120;
-    // for (let x = 0; x < 30; x++){
-    //   levelImages.push(cardImages[x % 15]);
-    // } 
   } else if (level.l == 3){
     level.row = 5;
     level.col = 8;
     levelTime = 300;
-    // for (let x = 0; x < 40; x++){
-    //   levelImages.push(cardImages[x % 20]);
-    // }
   }
 
   // Adjust card size for each level
@@ -375,23 +369,12 @@ function winGame(){
   levelBtn.collider = 's';
   endMessage.visible = true;
   endMessage.text = 'You Win!\n\nYour Score : '+score;
-
-  setTimeout(() => {
-    bunny.visible = false;
-    balls.visible = false;
-    endMessage.visible = false;
-    gameStart = false;
-  }, 5000);
 }
 
 function loseGame(){
   endMessage.visible = true;
   endMessage.text = 'Replay?';
   startBtn.text = 'Restart';
-  setTimeout(() => {
-    // gameStart = false; // already set from topBar function
-    endMessage.visible = false;
-  }, 5000);
 }
 
 function resetGame(){
@@ -399,9 +382,6 @@ function resetGame(){
     startBtn.visible = false;
     startBtn.collider = 'n';
   } else {
-    // shuffle(levelImages, true);
-    // console.log('resetGame shuffle');
-    // cardRemain = level.row * level.col;
     carrots.visible = true;
     startBtn.visible = true;
     startBtn.collider = 's';
