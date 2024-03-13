@@ -58,7 +58,7 @@ class Card {
 }
 
 function preload() {
-  for (let i = 1; i < 27; i++) {
+  for (let i = 1; i < 31; i++) {
     // Load all card images - total 26
     cardImages.push(loadImage('image/bunny'+i+'.png')); 
   }
@@ -91,7 +91,6 @@ function preload() {
     loadSound('sound/win.wav'),
     loadSound('sound/win2.wav')
   ];
-
 }
 
 function setup() {
@@ -273,6 +272,7 @@ function mousePressed() {
             score += 100;
             playSound(10);
             console.log('match sound 10');
+            checkBonus(flipCards[1].img);
             flipCards = [];
           } else {
             // Not a match, flip back after a delay of 0.5 second
@@ -284,7 +284,7 @@ function mousePressed() {
               cardRemain += 2;
               flipCards = [];
               if (score > 0){
-                score -= 50;
+                score -= 10;
               }
               allowFlip = true;
             }, 500);
@@ -376,11 +376,11 @@ function createLevel(level){
     levelTime = 60;
   } else if (level.l == 2){
     level.row = 5;
-    level.col = 6;
-    levelTime = 120;
+    level.col = 8;
+    levelTime = 180;
   } else if (level.l == 3){
-    level.row = 4;
-    level.col = 13;
+    level.row = 6;
+    level.col = 10;
     levelTime = 300;
   }
 
@@ -424,6 +424,18 @@ function createLevel(level){
         let imgIndex = i * level.row + j;
         cards.push(new Card(x, y, cardSize, levelImages[imgIndex]));
       }
+    }
+}
+
+function checkBonus(img){
+    if (img === cardImages[9]){
+        levelTime += 10;
+    } else if (img === cardImages[19]){
+        score += 100;
+    } else if (img === cardImages[28]){
+        levelTime += 30;
+    } else if (img === cardImages[29]){
+        score += 500;
     }
 }
 
