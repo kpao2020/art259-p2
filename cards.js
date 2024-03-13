@@ -143,6 +143,8 @@ function setup() {
   levelBtn.color = 'lime';
   levelBtn.visible = false;
 
+  // Sound button will be positioned below Start button initially
+  // but will move to top bar section once game starts
   soundBtn = new Sprite(width*0.5, height*0.65, 100, 100, 's');
   isMute = false;
 
@@ -344,11 +346,11 @@ function topBar(){
   } else {
     text('Level '+level.l, width*0.15, height*0.85);
     
-    soundBtn.x = width*0.5;
-    soundBtn.y = height*0.65;
-    soundBtn.scale = 1;
-    soundBtn.w = 100;
-    soundBtn.h = 100;
+    // soundBtn.x = width*0.5;
+    // soundBtn.y = height*0.65;
+    // soundBtn.scale = 1;
+    // soundBtn.w = 100;
+    // soundBtn.h = 100;
   }
 
   if (soundBtn.mouse.presses()) {
