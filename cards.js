@@ -24,7 +24,38 @@ let endMessage; // Display end game message
 let allowFlip; // Flip control state
 let carrots, carrotImages=[]; // Start page animation
 let bunny, winImage, loseImage; // Win/Lose page image
-let sounds;
+let sounds, soundBtn, isMute, soundOnImg, soundOffImg;
+
+class Card {
+  constructor(x, y, size, img) {
+    this.x = x;
+    this.y = y;
+    this.w = size.w;
+    this.h = size.h;
+    this.img = img;
+    this.flipped = false; // false = face down
+  }
+
+  // show card image
+  display() {
+    rect(this.x, this.y, this.w, this.h);
+    if (this.flipped) {
+      image(this.img, this.x, this.y, this.w, this.h);
+    } else {
+      image(backImage, this.x, this.y, this.w, this.h);
+    }
+  }
+
+  // check if mouse is 'hover' within each card area
+  hovers(px, py) {
+    return (px > this.x && px < this.x + this.w && py > this.y && py < this.y + this.h);
+  }
+
+  // flip state
+  flip() {
+    this.flipped = !this.flipped;
+  }
+}
 
 function preload() {
   for (let i = 1; i < 27; i++) {
@@ -40,6 +71,9 @@ function preload() {
   backImage = loadImage('image/bunnyBack.png');
   winImage = loadImage('image/win.png');
   loseImage = loadImage('image/lose.png');
+
+  soundOnImg = loadImage('image/soundOn.png');
+  soundOffImg = loadImage('image/soundOff.png');
 
   sounds = [
     loadSound('sound/achieve.wav'),
@@ -109,6 +143,11 @@ function setup() {
   levelBtn.color = 'lime';
   levelBtn.visible = false;
 
+  // Sound button will be positioned below Start button initially
+  // but will move to top bar section once game starts
+  soundBtn = new Sprite(width*0.5, height*0.65, 100, 100, 's');
+  isMute = false;
+
   gameStart = false;
   allowFlip = false;
   
@@ -125,7 +164,7 @@ function draw() {
 
   // Skip level: keyCode 76 = 'L' key
   if (keyIsDown(76)){
-    sounds[11].play();
+    playSound(11);
     console.log('l key sound 11');
     endMessage.visible = false;
     allowFlip = false;
@@ -156,7 +195,7 @@ function draw() {
   }
   
   if (startBtn.mouse.presses()) {
-    sounds[9].play();
+    playSound(9);
     console.log('startBtn sound 9');
     gameStart = true;
     allowFlip = true;
@@ -179,7 +218,7 @@ function draw() {
   }
 
   if (levelBtn.mouse.presses()){
-    sounds[1].play();
+    playSound(1);
     console.log('lBtn sound 1');
     gameStart = true;
     allowFlip = true;
@@ -223,7 +262,7 @@ function mousePressed() {
     for (let card of cards) {
       if (card.hovers(mouseX, mouseY) && !card.flipped) {
         card.flip();
-        sounds[0].play();
+        playSound(0);
         console.log('flip 1st card sound 0');
         cardRemain--;
         flipCards.push(card);
@@ -232,7 +271,7 @@ function mousePressed() {
             // Match section
             // console.log('match');
             score += 100;
-            sounds[10].play();
+            playSound(10);
             console.log('match sound 10');
             flipCards = [];
           } else {
@@ -256,34 +295,11 @@ function mousePressed() {
   }
 }
 
-class Card {
-  constructor(x, y, size, img) {
-    this.x = x;
-    this.y = y;
-    this.w = size.w;
-    this.h = size.h;
-    this.img = img;
-    this.flipped = false; // false = face down
-  }
-
-  // show card image
-  display() {
-    rect(this.x, this.y, this.w, this.h);
-    if (this.flipped) {
-      image(this.img, this.x, this.y, this.w, this.h);
-    } else {
-      image(backImage, this.x, this.y, this.w, this.h);
-    }
-  }
-
-  // check if mouse is 'hover' within each card area
-  hovers(px, py) {
-    return (px > this.x && px < this.x + this.w && py > this.y && py < this.y + this.h);
-  }
-
-  // flip state
-  flip() {
-    this.flipped = !this.flipped;
+function playSound(i){
+  if (!isMute){
+    sounds[i].play();
+  } else {
+    sounds[i].stop();
   }
 }
 
@@ -299,6 +315,11 @@ function topBar(){
   if (gameStart){
     text('Score: '+score.toString(),width*0.5,height*0.07);
 
+    soundBtn.x = width*0.75;
+    soundBtn.y = height*0.062;
+    soundBtn.scale = 0.3;
+    soundBtn.w = 30;
+    soundBtn.h = 30;
     ///// prevent time to run over 0 /////
     if (gameTime > 0) {
       text('Cards: '+cardRemain.toString(), width*0.15, height*0.07);
@@ -307,7 +328,7 @@ function topBar(){
       // check winning condition
       if (cardRemain == 0){
         winGame();
-        sounds[2].play();
+        playSound(2);
         console.log('win sound 2');
         gameStart = false;
       }
@@ -318,12 +339,28 @@ function topBar(){
       gameStart = false;
       if ((cardRemain > 0)&&(!levelBtn.visible)){
         loseGame();
-        sounds[8].play();
+        playSound(8);
         console.log('lose sound 8');
       }
     }
   } else {
     text('Level '+level.l, width*0.15, height*0.85);
+    
+    // soundBtn.x = width*0.5;
+    // soundBtn.y = height*0.65;
+    // soundBtn.scale = 1;
+    // soundBtn.w = 100;
+    // soundBtn.h = 100;
+  }
+
+  if (soundBtn.mouse.presses()) {
+    isMute = !isMute;
+    console.log('isMute',isMute);
+  }
+  if (isMute){
+    soundBtn.img = soundOffImg;
+  } else {
+    soundBtn.img = soundOnImg;
   }
 }
 
