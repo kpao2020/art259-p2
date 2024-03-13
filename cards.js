@@ -37,10 +37,6 @@ function preload() {
     carrotImages.push(loadImage('image/carrotmove'+j+'.png')); 
   }
 
-  // for (let k = 1; k < 6; k++){
-  //   ballImages.push(loadImage('image/ball'+k+'.png'));
-  // }
-
   backImage = loadImage('image/bunnyBack.png');
   winImage = loadImage('image/win.png');
   loseImage = loadImage('image/lose.png');
@@ -100,7 +96,7 @@ function setup() {
   carrots.life = 120; // 2 seconds
 
   bunny = new Sprite(width*0.5, height*0.85, 1, 'n');
-  bunny.img = winImage;
+  
   bunny.visible = false;
 
   startBtn = new Sprite(width*0.5, height*0.5, 150, 's');
@@ -131,6 +127,8 @@ function draw() {
   if (keyIsDown(76)){
     sounds[11].play();
     console.log('l key sound 11');
+    endMessage.visible = false;
+    allowFlip = false;
     levelBtn.visible = true;
     levelBtn.collider = 's';
     levelBtn.text = 'Secret Skip'
@@ -162,6 +160,7 @@ function draw() {
     console.log('startBtn sound 9');
     gameStart = true;
     allowFlip = true;
+    bunny.visible = false;
     endMessage.visible = false;
     carrots.visible = false;
     startBtn.visible = false;
@@ -343,8 +342,8 @@ function createLevel(level){
     level.col = 6;
     levelTime = 120;
   } else if (level.l == 3){
-    level.row = 5;
-    level.col = 8;
+    level.row = 4;
+    level.col = 13;
     levelTime = 300;
   }
 
@@ -392,6 +391,7 @@ function createLevel(level){
 }
 
 function winGame(){
+  bunny.img = winImage;
   bunny.visible = true;
   balls.visible = true;
   if (level.l < 3){
@@ -406,6 +406,8 @@ function winGame(){
 }
 
 function loseGame(){
+  bunny.img = loseImage;
+  bunny.visible = true;
   endMessage.visible = true;
   endMessage.text = 'Replay?';
   startBtn.text = 'Restart';
