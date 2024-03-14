@@ -94,7 +94,9 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(windowWidth*0.95, windowHeight*0.95);
+  let cnv = createCanvas(windowWidth*0.95, windowHeight*0.95);
+
+  cnv.doubleClicked(showLevel);
 
   // initialize level 1 parameters
   level = {
@@ -161,17 +163,7 @@ function draw() {
   clear();
   background('lightyellow');
 
-  // Skip level: keyCode 76 = 'L' key
-  if (keyIsDown(76)){
-    playSound(11);
-    console.log('l key sound 11');
-    endMessage.visible = false;
-    allowFlip = false;
-    levelBtn.visible = true;
-    levelBtn.collider = 's';
-    levelBtn.text = 'Secret Skip'
-    flipCards = []; // avoid cardRemain error
-  } 
+  
 
   // Start page animation
   if (carrots.visible){
@@ -293,6 +285,18 @@ function mousePressed() {
       }
     }
   }
+}
+
+function showLevel(){
+  // Skip level: double click on canvas
+      playSound(11);
+      console.log('l key sound 11');
+      endMessage.visible = false;
+      allowFlip = false;
+      levelBtn.visible = true;
+      levelBtn.collider = 's';
+      levelBtn.text = 'Secret Skip'
+      flipCards = []; // avoid cardRemain error
 }
 
 function playSound(i){
@@ -481,3 +485,6 @@ function windowResized(){
   // Canvas is set to 80% width and height - match setup scale
   resizeCanvas(windowWidth*0.9, windowHeight*0.9);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Reference
