@@ -15,7 +15,7 @@ let backImage; // Back of card image
 let cardSize; // Card size based on device screen
 let space; // Spacer between cards
 let level; // level grid
-let gameTime, startTime, levelTime; // Timing variables
+let gameTime, startTime, levelTime, lTime; // Timing variables
 let startBtn, levelBtn; // Start Button
 let gameStart; // Game Start state = true or false
 let score; // Keep track of score
@@ -118,10 +118,10 @@ function setup() {
   balls = new Group();
   balls.x = width*0.54; // animation test: ball.x = () => random(width*0.2, width*0.8);
   balls.y = height*0.72; // animation test: ball.y = () => random(height*0.5, height*0.8);
-  balls.d = 5;
+  balls.d = () => random (5, 10);
   balls.collider = 'none';
 	balls.direction = () => random(0, 360);
-	balls.speed = 2;
+	balls.speed = () => random(1, 3);
   balls.visible = false;
   balls.life = 120; // 2 seconds
 
@@ -157,6 +157,7 @@ function setup() {
 
   gameStart = false;
   allowFlip = false;
+  score = 0;
   
   endMessage = new Sprite(width*0.5, height*0.3, 1, 'n');
   endMessage.color = 'lightyellow';
@@ -193,15 +194,16 @@ function draw() {
   if (startBtn.mouse.presses()) {
     playSound(8);
     console.log('startBtn sound 8');
-    gameStart = true;
-    allowFlip = true;
+    // gameStart = true;
+    // allowFlip = true;
     bunny.visible = false;
-    endMessage.visible = false;
+    // endMessage.visible = false;
     carrots.visible = false;
     startBtn.visible = false;
     startBtn.collider = 'n';
     createLevel(level);
     startTime = millis();
+    // levelScreen();
   }
 
   ///// Next Level /////
@@ -215,12 +217,12 @@ function draw() {
 
   if (levelBtn.mouse.presses()){
     playSound(1);
-    console.log('lBtn sound 1');
-    gameStart = true;
-    allowFlip = true;
+    console.log('levelBtn sound 1');
+    // gameStart = true;
+    // allowFlip = true;
     bunny.visible = false; 
     balls.visible = false; 
-    endMessage.visible = false;
+    // endMessage.visible = false;
     carrots.visible = false;
     levelBtn.visible = false;
     levelBtn.collider = 'n';
@@ -233,9 +235,9 @@ function draw() {
 
   // Winning animation
   if (balls.visible){
-    if (balls.length < 20){
+    if (balls.length < 25){
       let ball = new balls.Sprite();
-      ball.color = color(random(255),random(255),random(255));
+      ball.color = color(random(255),random(255),random(255),random(60,100));
       // animation test: ball.img = ballImages[round(random(4))];
     }
   } else {
@@ -294,21 +296,43 @@ function mousePressed() {
 
 function keyPressed(k){
   if (k.code === 'KeyP'){
+    playSound(10);
+    console.log('p key sound 10');
     showLevel();
   }
 }
 
 function showLevel(){
-  // Skip level: double click on canvas
-      playSound(10);
-      console.log('l key sound 10');
+  // Skip level: Press P key
+      gameStart = false;
       endMessage.visible = false;
       allowFlip = false;
       levelBtn.visible = true;
       levelBtn.collider = 's';
       levelBtn.text = 'Secret Skip'
+      startBtn.visible = false;
+      startBtn.collider = 'n';
+      carrots.visible = false;
       flipCards = []; // avoid cardRemain error
 }
+
+// function levelScreen(){
+  
+//   lTime = 5 - round((millis()-startTime)/1000);
+//   console.log('startTime ',startTime,'ltime',lTime);
+//   endMessage.text = 'Level '+level.l;
+//   if (lTime > 0){
+//     endMessage.visible = true;
+//     if (lTime <= 3){
+//       textSize(30);
+//       text('Ready in : '+lTime.toString(), width*0.5, height*0.5);
+//     }
+//   } else if (lTime == 0) {
+//     gameStart = true;
+//     allowFlip = true;
+//     endMessage.visible = false;
+//   }
+// }
 
 function playSound(i){
   if (!isMute){
@@ -324,8 +348,22 @@ function topBar(){
   textAlign(CENTER);
 
   ///// timer function /////
-  gameTime = levelTime - round((millis()-startTime)/1000);
+  lTime = 3 - round((millis()-startTime)/1000);
+  gameTime = levelTime + 3 - round((millis()-startTime)/1000);
 
+  if (lTime > 0){
+    endMessage.visible = true;
+    endMessage.text = 'Level '+level.l;
+    if (lTime <= 3){
+      textSize(30);
+      text('Ready in : '+lTime.toString(), width*0.5, height*0.5);
+    }
+  } else if (lTime == 0) {
+    gameStart = true;
+    allowFlip = true;
+    endMessage.visible = false;
+  }
+  
   ///// Start game time when click Start /////
   if (gameStart){
     text('Score: '+score.toString(),width*0.5,height*0.05);
@@ -358,15 +396,16 @@ function topBar(){
         console.log('lose sound 7');
       }
     }
-  } else {
-    text('Level '+level.l, width*0.15, height*0.85);
+  } 
+  // else {
+  //   text('Level '+level.l, width*0.5, height*0.05);
     
     // soundBtn.x = width*0.5;
     // soundBtn.y = height*0.65;
     // soundBtn.scale = 1;
     // soundBtn.w = 100;
     // soundBtn.h = 100;
-  }
+  // }
 
   if (soundBtn.mouse.presses()) {
     isMute = !isMute;
@@ -420,28 +459,10 @@ function createLevel(level){
     h: tempH
   };
   
-  // Note: number of card images has to be 2x to 
-  //       fit full level images array
-  //       Example:
-  //          # of card images = 1 to 10
-  //          max card images = 10
-  //
-  //          # of level images = 2,4,6,8,10,12,14,16,18,20
-  //          max level images = 20
-  //
-  //       Easy Level
-  //          level.row = 2;
-  //          level.col = 2;
-  //          for (let x = 0; x < cardRemain; x++){
-  //            levelImages.push(cardImages[x % (cardRemain/2)]);
-  //          }
-  //
-  //  *** cardRemain/2 <= cardImages.length ***
   shuffle(cardImages, true);
   cardRemain = level.row * level.col;
-  let k = cardRemain - (2*level.l);
+  let k = cardRemain - pow(2, level.l); // 2^level.l = bonus cards
   for (let x = 0; x < k; x++){
-    console.log('k',k,'card index',x%(k/2));
     levelImages.push(cardImages[x % (k/2)]);
   }
 
@@ -480,6 +501,8 @@ function winGame(){
   }
   levelBtn.visible = true;
   levelBtn.collider = 's';
+  startBtn.visible = false;
+  startBtn.collider = 'n';
   endMessage.visible = true;
   endMessage.text = 'You Win!\n\nYour Score : '+score;
 }
@@ -490,17 +513,12 @@ function loseGame(){
   endMessage.visible = true;
   endMessage.text = 'Replay?';
   startBtn.text = 'Restart';
+  carrots.visible = true;
+  startBtn.visible = true;
+  startBtn.collider = 's';
 }
 
 function resetGame(){
-  if (levelBtn.visible){
-    startBtn.visible = false;
-    startBtn.collider = 'n';
-  } else {
-    carrots.visible = true;
-    startBtn.visible = true;
-    startBtn.collider = 's';
-  }
   score = 0;
   allowFlip = false;
   flipCards = [];
