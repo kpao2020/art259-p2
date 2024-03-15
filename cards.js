@@ -1,8 +1,9 @@
 // Team : Ken Pao, Yuying Huang
 // Class: ART 259
 // Project 2
-// Title: <tbd>
-// Game link: <tbd>
+// Title: Bunny Cards
+// Game link: https://editor.p5js.org/kpao2020/full/fzBTVf7VF
+//            https://bunny-cards.glitch.me
 // Reference: listed at the end of this file
 ///////////////////////////////////////////////////////////////////////////////
 
