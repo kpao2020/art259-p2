@@ -118,10 +118,10 @@ function setup() {
   balls = new Group();
   balls.x = width*0.54; // animation test: ball.x = () => random(width*0.2, width*0.8);
   balls.y = height*0.72; // animation test: ball.y = () => random(height*0.5, height*0.8);
-  balls.d = 10;
+  balls.d = () => random (5, 10);
   balls.collider = 'none';
 	balls.direction = () => random(0, 360);
-	balls.speed = 2;
+	balls.speed = () => random(1, 3);
   balls.visible = false;
   balls.life = 120; // 2 seconds
 
@@ -233,9 +233,9 @@ function draw() {
 
   // Winning animation
   if (balls.visible){
-    if (balls.length < 20){
+    if (balls.length < 25){
       let ball = new balls.Sprite();
-      ball.color = color(random(255),random(255),random(255));
+      ball.color = color(random(255),random(255),random(255),random(60,100));
       // animation test: ball.img = ballImages[round(random(4))];
     }
   } else {
@@ -297,6 +297,7 @@ function keyPressed(k){
     playSound(10);
     console.log('p key sound 10');
     showLevel();
+    balls.visible = true;
   }
 }
 
