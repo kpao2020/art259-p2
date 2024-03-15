@@ -15,7 +15,7 @@ let backImage; // Back of card image
 let cardSize; // Card size based on device screen
 let space; // Spacer between cards
 let level; // level grid
-let gameTime, startTime, levelTime; // Timing variables
+let gameTime, startTime, levelTime, lTime; // Timing variables
 let startBtn, levelBtn; // Start Button
 let gameStart; // Game Start state = true or false
 let score; // Keep track of score
@@ -157,6 +157,7 @@ function setup() {
 
   gameStart = false;
   allowFlip = false;
+  score = 0;
   
   endMessage = new Sprite(width*0.5, height*0.3, 1, 'n');
   endMessage.color = 'lightyellow';
@@ -193,15 +194,16 @@ function draw() {
   if (startBtn.mouse.presses()) {
     playSound(8);
     console.log('startBtn sound 8');
-    gameStart = true;
-    allowFlip = true;
+    // gameStart = true;
+    // allowFlip = true;
     bunny.visible = false;
-    endMessage.visible = false;
+    // endMessage.visible = false;
     carrots.visible = false;
     startBtn.visible = false;
     startBtn.collider = 'n';
     createLevel(level);
     startTime = millis();
+    // levelScreen();
   }
 
   ///// Next Level /////
@@ -216,11 +218,11 @@ function draw() {
   if (levelBtn.mouse.presses()){
     playSound(1);
     console.log('levelBtn sound 1');
-    gameStart = true;
-    allowFlip = true;
+    // gameStart = true;
+    // allowFlip = true;
     bunny.visible = false; 
     balls.visible = false; 
-    endMessage.visible = false;
+    // endMessage.visible = false;
     carrots.visible = false;
     levelBtn.visible = false;
     levelBtn.collider = 'n';
@@ -302,13 +304,35 @@ function keyPressed(k){
 
 function showLevel(){
   // Skip level: Press P key
+      gameStart = false;
       endMessage.visible = false;
       allowFlip = false;
       levelBtn.visible = true;
       levelBtn.collider = 's';
       levelBtn.text = 'Secret Skip'
+      startBtn.visible = false;
+      startBtn.collider = 'n';
+      carrots.visible = false;
       flipCards = []; // avoid cardRemain error
 }
+
+// function levelScreen(){
+  
+//   lTime = 5 - round((millis()-startTime)/1000);
+//   console.log('startTime ',startTime,'ltime',lTime);
+//   endMessage.text = 'Level '+level.l;
+//   if (lTime > 0){
+//     endMessage.visible = true;
+//     if (lTime <= 3){
+//       textSize(30);
+//       text('Ready in : '+lTime.toString(), width*0.5, height*0.5);
+//     }
+//   } else if (lTime == 0) {
+//     gameStart = true;
+//     allowFlip = true;
+//     endMessage.visible = false;
+//   }
+// }
 
 function playSound(i){
   if (!isMute){
@@ -324,8 +348,22 @@ function topBar(){
   textAlign(CENTER);
 
   ///// timer function /////
-  gameTime = levelTime - round((millis()-startTime)/1000);
+  lTime = 3 - round((millis()-startTime)/1000);
+  gameTime = levelTime + 3 - round((millis()-startTime)/1000);
 
+  if (lTime > 0){
+    endMessage.visible = true;
+    endMessage.text = 'Level '+level.l;
+    if (lTime <= 3){
+      textSize(30);
+      text('Ready in : '+lTime.toString(), width*0.5, height*0.5);
+    }
+  } else if (lTime == 0) {
+    gameStart = true;
+    allowFlip = true;
+    endMessage.visible = false;
+  }
+  
   ///// Start game time when click Start /////
   if (gameStart){
     text('Score: '+score.toString(),width*0.5,height*0.05);
@@ -358,15 +396,16 @@ function topBar(){
         console.log('lose sound 7');
       }
     }
-  } else {
-    text('Level '+level.l, width*0.5, height*0.05);
+  } 
+  // else {
+  //   text('Level '+level.l, width*0.5, height*0.05);
     
     // soundBtn.x = width*0.5;
     // soundBtn.y = height*0.65;
     // soundBtn.scale = 1;
     // soundBtn.w = 100;
     // soundBtn.h = 100;
-  }
+  // }
 
   if (soundBtn.mouse.presses()) {
     isMute = !isMute;
@@ -462,6 +501,8 @@ function winGame(){
   }
   levelBtn.visible = true;
   levelBtn.collider = 's';
+  startBtn.visible = false;
+  startBtn.collider = 'n';
   endMessage.visible = true;
   endMessage.text = 'You Win!\n\nYour Score : '+score;
 }
@@ -472,17 +513,12 @@ function loseGame(){
   endMessage.visible = true;
   endMessage.text = 'Replay?';
   startBtn.text = 'Restart';
+  carrots.visible = true;
+  startBtn.visible = true;
+  startBtn.collider = 's';
 }
 
 function resetGame(){
-  if (levelBtn.visible){
-    startBtn.visible = false;
-    startBtn.collider = 'n';
-  } else {
-    carrots.visible = true;
-    startBtn.visible = true;
-    startBtn.collider = 's';
-  }
   score = 0;
   allowFlip = false;
   flipCards = [];
