@@ -297,7 +297,6 @@ function keyPressed(k){
     playSound(10);
     console.log('p key sound 10');
     showLevel();
-    balls.visible = true;
   }
 }
 
