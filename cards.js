@@ -355,8 +355,8 @@ function topBar(){
     endMessage.visible = true;
     endMessage.text = 'Level '+level.l;
     if (lTime <= 3){
-      textSize(30);
-      text('Ready in : '+lTime.toString(), width*0.5, height*0.5);
+      textSize(60);
+      text(lTime.toString(), width*0.5, height*0.4);
     }
   } else if (lTime == 0) {
     gameStart = true;
@@ -396,7 +396,22 @@ function topBar(){
         console.log('lose sound 7');
       }
     }
-  } 
+  } else {
+    // Show Title of Game and Instructions
+    if ((startBtn.visible) && (startBtn.text === 'START')){
+      endMessage.text = "Bunny Cards";
+      endMessage.visible = true;
+      fill(255);
+      textAlign(LEFT);
+      textSize(30);
+      text(
+        'Rules:\
+        \nEach level has bonus card(s)\
+        \nEach incorrect guess = -10 points\
+        \nEach correct match   = +100 points\
+        \nMatch all the cards to proceed next level.',width*0.15,height*0.75);
+    }
+  }
   // else {
   //   text('Level '+level.l, width*0.5, height*0.05);
     
