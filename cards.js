@@ -9,6 +9,7 @@
 let cards = []; // Array to store card objects
 let flipCards = []; // Array to track flipped cards (2 max)
 let cardImages = []; // Array of card images
+let bonusImages = []; // Array of bonus images
 let levelImages = []; // Array of images for each level
 let backImage; // Back of card image
 let cardSize; // Card size based on device screen
@@ -58,12 +59,17 @@ class Card {
 }
 
 function preload() {
-  for (let i = 1; i < 31; i++) {
+  for (let i = 0; i < 26; i++) {
     // Load all card images - total 26
     cardImages.push(loadImage('image/bunny'+i+'.png')); 
   }
 
-  for (let j = 1; j < 3; j++) {
+  for (let b = 0; b < 4; b++) {
+    // Load all bonus images - total 4
+    bonusImages.push(loadImage('image/bonus'+b+'.png')); 
+  }
+
+  for (let j = 0; j < 2; j++) {
     // load carrot animation images
     carrotImages.push(loadImage('image/carrotmove'+j+'.png')); 
   }
@@ -83,7 +89,6 @@ function preload() {
     loadSound('sound/hp-recharge.wav'),
     loadSound('sound/level-complete.wav'),
     loadSound('sound/level-complete2.wav'),
-    loadSound('sound/level-music.wav'),
     loadSound('sound/lose.wav'),
     loadSound('sound/p-boost.wav'),
     loadSound('sound/treasure.wav'),
@@ -186,8 +191,8 @@ function draw() {
   }
   
   if (startBtn.mouse.presses()) {
-    playSound(9);
-    console.log('startBtn sound 9');
+    playSound(8);
+    console.log('startBtn sound 8');
     gameStart = true;
     allowFlip = true;
     bunny.visible = false;
@@ -262,8 +267,8 @@ function mousePressed() {
             // Match section
             // console.log('match');
             score += 100;
-            playSound(10);
-            console.log('match sound 10');
+            playSound(9);
+            console.log('match sound 9');
             checkBonus(flipCards[1].img);
             flipCards = [];
           } else {
@@ -289,8 +294,8 @@ function mousePressed() {
 
 function showLevel(){
   // Skip level: double click on canvas
-      playSound(11);
-      console.log('l key sound 11');
+      playSound(10);
+      console.log('l key sound 10');
       endMessage.visible = false;
       allowFlip = false;
       levelBtn.visible = true;
@@ -343,8 +348,8 @@ function topBar(){
       gameStart = false;
       if ((cardRemain > 0)&&(!levelBtn.visible)){
         loseGame();
-        playSound(8);
-        console.log('lose sound 8');
+        playSound(7);
+        console.log('lose sound 7');
       }
     }
   } else {
@@ -378,14 +383,26 @@ function createLevel(level){
     level.row = 4;
     level.col = 5;
     levelTime = 60;
+    levelImages.push(bonusImages[0]);
+    levelImages.push(bonusImages[0]);
   } else if (level.l == 2){
     level.row = 5;
     level.col = 8;
     levelTime = 180;
+    levelImages.push(bonusImages[0]);
+    levelImages.push(bonusImages[1]);
+    levelImages.push(bonusImages[0]);
+    levelImages.push(bonusImages[1]);
   } else if (level.l == 3){
     level.row = 6;
     level.col = 10;
     levelTime = 300;
+    for (let i = 0; i < bonusImages.length; i++){
+      levelImages.push(bonusImages[i]);
+    }
+    for (let i = 0; i < bonusImages.length; i++){
+      levelImages.push(bonusImages[i]);
+    }
   }
 
   // Adjust card size for each level
@@ -414,31 +431,34 @@ function createLevel(level){
   //          }
   //
   //  *** cardRemain/2 <= cardImages.length ***
+  shuffle(cardImages, true);
   cardRemain = level.row * level.col;
-  for (let x = 0; x < cardRemain; x++){
-    levelImages.push(cardImages[x % (cardRemain/2)]);
+  let k = cardRemain - (2*level.l);
+  for (let x = 0; x < k; x++){
+    console.log('k',k,'card index',x%(k/2));
+    levelImages.push(cardImages[x % (k/2)]);
   }
 
   shuffle(levelImages, true);
-    // Create new card objects
-    for (let i = 0; i < level.col; i++) {
-      for (let j = 0; j < level.row; j++) {
-        let x = i * (cardSize.w + space) + space;
-        let y = (j + 0.5) * (cardSize.h + space);
-        let imgIndex = i * level.row + j;
-        cards.push(new Card(x, y, cardSize, levelImages[imgIndex]));
-      }
+  // Create new card objects
+  for (let i = 0; i < level.col; i++) {
+    for (let j = 0; j < level.row; j++) {
+      let x = i * (cardSize.w + space) + space;
+      let y = (j + 0.5) * (cardSize.h + space);
+      let imgIndex = i * level.row + j;
+      cards.push(new Card(x, y, cardSize, levelImages[imgIndex]));
     }
+  }
 }
 
 function checkBonus(img){
-    if (img === cardImages[9]){
+    if (img === bonusImages[0]){
         levelTime += 10;
-    } else if (img === cardImages[19]){
+    } else if (img === bonusImages[1]){
         score += 100;
-    } else if (img === cardImages[28]){
+    } else if (img === bonusImages[2]){
         levelTime += 30;
-    } else if (img === cardImages[29]){
+    } else if (img === bonusImages[3]){
         score += 500;
     }
 }
