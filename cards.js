@@ -26,6 +26,7 @@ let allowFlip; // Flip control state
 let carrots, carrotImages=[]; // Start page animation
 let bunny, winImage, loseImage; // Win/Lose page image
 let sounds, soundBtn, isMute, soundOnImg, soundOffImg;
+let bg;
 
 class Card {
   constructor(x, y, size, img) {
@@ -77,9 +78,9 @@ function preload() {
   backImage = loadImage('image/bunnyBack.png');
   winImage = loadImage('image/win.png');
   loseImage = loadImage('image/lose.png');
-
-  soundOnImg = loadImage('image/soundOn.png');
-  soundOffImg = loadImage('image/soundOff.png');
+  bg = loadImage('image/background.jpg');
+  soundOnImg = loadImage('image/soundOn50.png');
+  soundOffImg = loadImage('image/soundOff50.png');
 
   sounds = [
     loadSound('sound/achieve.wav'),
@@ -101,7 +102,7 @@ function preload() {
 function setup() {
   let cnv = createCanvas(windowWidth*0.95, windowHeight*0.95);
 
-  cnv.doubleClicked(showLevel);
+  // cnv.doubleClicked(showLevel);
 
   // initialize level 1 parameters
   level = {
@@ -151,7 +152,7 @@ function setup() {
 
   // Sound button will be positioned below Start button initially
   // but will move to top bar section once game starts
-  soundBtn = new Sprite(width*0.5, height*0.65, 100, 100, 's');
+  soundBtn = new Sprite(width*0.7, height*0.04, 50, 50, 's');
   isMute = false;
 
   gameStart = false;
@@ -166,10 +167,9 @@ function setup() {
 
 function draw() {
   clear();
-  background('lightyellow');
-
+  // background('lightyellow');
+  background(bg);
   
-
   // Start page animation
   if (carrots.visible){
     if (carrots.length < 3){
@@ -292,6 +292,12 @@ function mousePressed() {
   }
 }
 
+function keyPressed(k){
+  if (k.code === 'KeyP'){
+    showLevel();
+  }
+}
+
 function showLevel(){
   // Skip level: double click on canvas
       playSound(10);
@@ -322,17 +328,17 @@ function topBar(){
 
   ///// Start game time when click Start /////
   if (gameStart){
-    text('Score: '+score.toString(),width*0.5,height*0.07);
+    text('Score: '+score.toString(),width*0.5,height*0.05);
 
-    soundBtn.x = width*0.75;
-    soundBtn.y = height*0.062;
-    soundBtn.scale = 0.3;
-    soundBtn.w = 30;
-    soundBtn.h = 30;
+    // soundBtn.x = width*0.75;
+    // soundBtn.y = height*0.062;
+    // soundBtn.scale = 0.3;
+    // soundBtn.w = 30;
+    // soundBtn.h = 30;
     ///// prevent time to run over 0 /////
     if (gameTime > 0) {
-      text('Cards: '+cardRemain.toString(), width*0.15, height*0.07);
-      text('Time : '+gameTime.toString(), width*0.85, height*0.07);
+      text('Cards: '+cardRemain.toString(), width*0.15, height*0.05);
+      text('Time : '+gameTime.toString(), width*0.85, height*0.05);
 
       // check winning condition
       if (cardRemain == 0){
@@ -344,7 +350,7 @@ function topBar(){
     }
     ///// stop game when time reaches 0 /////
     else {
-      text('Time : 0', width*0.85, height*0.07);
+      text('Time : 0', width*0.85, height*0.05);
       gameStart = false;
       if ((cardRemain > 0)&&(!levelBtn.visible)){
         loseGame();
