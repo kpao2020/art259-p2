@@ -118,7 +118,7 @@ function setup() {
   balls = new Group();
   balls.x = width*0.54; // animation test: ball.x = () => random(width*0.2, width*0.8);
   balls.y = height*0.72; // animation test: ball.y = () => random(height*0.5, height*0.8);
-  balls.d = 5;
+  balls.d = 10;
   balls.collider = 'none';
 	balls.direction = () => random(0, 360);
 	balls.speed = 2;
@@ -215,7 +215,7 @@ function draw() {
 
   if (levelBtn.mouse.presses()){
     playSound(1);
-    console.log('lBtn sound 1');
+    console.log('levelBtn sound 1');
     gameStart = true;
     allowFlip = true;
     bunny.visible = false; 
@@ -294,14 +294,14 @@ function mousePressed() {
 
 function keyPressed(k){
   if (k.code === 'KeyP'){
+    playSound(10);
+    console.log('p key sound 10');
     showLevel();
   }
 }
 
 function showLevel(){
-  // Skip level: double click on canvas
-      playSound(10);
-      console.log('l key sound 10');
+  // Skip level: Press P key
       endMessage.visible = false;
       allowFlip = false;
       levelBtn.visible = true;
@@ -359,7 +359,7 @@ function topBar(){
       }
     }
   } else {
-    text('Level '+level.l, width*0.15, height*0.85);
+    text('Level '+level.l, width*0.5, height*0.05);
     
     // soundBtn.x = width*0.5;
     // soundBtn.y = height*0.65;
@@ -420,28 +420,10 @@ function createLevel(level){
     h: tempH
   };
   
-  // Note: number of card images has to be 2x to 
-  //       fit full level images array
-  //       Example:
-  //          # of card images = 1 to 10
-  //          max card images = 10
-  //
-  //          # of level images = 2,4,6,8,10,12,14,16,18,20
-  //          max level images = 20
-  //
-  //       Easy Level
-  //          level.row = 2;
-  //          level.col = 2;
-  //          for (let x = 0; x < cardRemain; x++){
-  //            levelImages.push(cardImages[x % (cardRemain/2)]);
-  //          }
-  //
-  //  *** cardRemain/2 <= cardImages.length ***
   shuffle(cardImages, true);
   cardRemain = level.row * level.col;
-  let k = cardRemain - (2*level.l);
+  let k = cardRemain - pow(2, level.l); // 2^level.l = bonus cards
   for (let x = 0; x < k; x++){
-    console.log('k',k,'card index',x%(k/2));
     levelImages.push(cardImages[x % (k/2)]);
   }
 
