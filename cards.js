@@ -1,8 +1,9 @@
 // Team : Ken Pao, Yuying Huang
 // Class: ART 259
-// Project 2
-// Title: <tbd>
-// Game link: <tbd>
+// Assignment: Project 2
+// Title: Bunny Cards
+// Game link: https://editor.p5js.org/kpao2020/full/fzBTVf7VF
+//            https://bunny-cards.glitch.me
 // Reference: listed at the end of this file
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -12,22 +13,24 @@ let cardImages = []; // Array of card images
 let bonusImages = []; // Array of bonus images
 let levelImages = []; // Array of images for each level
 let backImage; // Back of card image
-let cardSize; // Card size based on device screen
+let cardSize; // Card size based on level and screen size
 let space; // Spacer between cards
-let level; // level grid
+let level; // Level grid
 let gameTime, startTime, levelTime, lTime; // Timing variables
-let startBtn, levelBtn; // Start Button
-let gameStart; // Game Start state = true or false
+let startBtn, levelBtn; // Start button
+let gameStart; // Game start state = true or false
 let score; // Keep track of score
 let cardRemain; // Keep track of remaining cards
-let balls, ballImages=[]; // End Game animation
+let balls; // End game animation
 let endMessage; // Display end game message
 let allowFlip; // Flip control state
 let carrots, carrotImages=[]; // Start page animation
 let bunny, winImage, loseImage; // Win/Lose page image
-let sounds, soundBtn, isMute, soundOnImg, soundOffImg;
-let bg;
+let sounds, soundBtn, isMute, soundOnImg, soundOffImg; // Sound variables
+let bg; // Background image
 
+// Class Card defines coordinate, size, image, 
+// flip state, mouse hover check and display function
 class Card {
   constructor(x, y, size, img) {
     this.x = x;
@@ -59,19 +62,20 @@ class Card {
   }
 }
 
+// Preload images and sound files into memory
 function preload() {
+  // Load all card images - total 26
   for (let i = 0; i < 26; i++) {
-    // Load all card images - total 26
     cardImages.push(loadImage('image/bunny'+i+'.png')); 
   }
 
+  // Load all bonus images - total 4
   for (let b = 0; b < 4; b++) {
-    // Load all bonus images - total 4
     bonusImages.push(loadImage('image/bonus'+b+'.png')); 
   }
 
+  // Load carrot animation images - total 2
   for (let j = 0; j < 2; j++) {
-    // load carrot animation images
     carrotImages.push(loadImage('image/carrotmove'+j+'.png')); 
   }
 
@@ -99,6 +103,7 @@ function preload() {
   ];
 }
 
+// Setup Canvas and initialize variables
 function setup() {
   let cnv = createCanvas(windowWidth*0.95, windowHeight*0.95);
 
@@ -116,16 +121,17 @@ function setup() {
   noStroke();
 
   balls = new Group();
-  balls.x = width*0.54; // animation test: ball.x = () => random(width*0.2, width*0.8);
-  balls.y = height*0.72; // animation test: ball.y = () => random(height*0.5, height*0.8);
+  balls.x = width*0.54; // balls animation test: ball.x = () => random(width*0.2, width*0.8);
+  balls.y = height*0.72; // balls animation test: ball.y = () => random(height*0.5, height*0.8);
   balls.d = () => random (5, 10);
-  balls.collider = 'none';
+  balls.collider = 'none'; // no collision needed for balls animation
 	balls.direction = () => random(0, 360);
 	balls.speed = () => random(1, 3);
   balls.visible = false;
   balls.life = 120; // 2 seconds
 
   carrots = new Group();
+  // wiggle is looping 2 images
   carrots.addAnimation('wiggle', carrotImages[0], carrotImages[1]);
   carrots.scale = 0.1;
   carrots.x = () => random(width*0.1, width*0.9);
@@ -136,15 +142,15 @@ function setup() {
   carrots.collider = 'n';
   carrots.life = 120; // 2 seconds
 
-  bunny = new Sprite(width*0.5, height*0.85, 1, 'n');
+  bunny = new Sprite(width*0.5, height*0.85, 1, 'n'); // placeholder for bunny image
   
   bunny.visible = false;
 
-  startBtn = new Sprite(width*0.5, height*0.5, 150, 's');
+  startBtn = new Sprite(width*0.5, height*0.5, 150, 's'); // start button
   startBtn.textSize = 28;
   startBtn.text = 'START';
 
-  levelBtn = new Sprite(width*0.85, height*0.85, 200, 100, 'n');
+  levelBtn = new Sprite(width*0.85, height*0.85, 200, 100, 'n'); // level button
   levelBtn.textSize = 28;
   
   levelBtn.color = 'lime';
@@ -152,7 +158,7 @@ function setup() {
 
   // Sound button will be positioned below Start button initially
   // but will move to top bar section once game starts
-  soundBtn = new Sprite(width*0.7, height*0.04, 50, 50, 's');
+  soundBtn = new Sprite(width*0.7, height*0.04, 50, 50, 's'); 
   isMute = false;
 
   gameStart = false;
@@ -166,6 +172,10 @@ function setup() {
   endMessage.visible = false;
 }
 
+// Draw function calls following functions
+// to run the game
+// topBar = card remaining, score, time remaining
+// createLevel = random load cards and bonus base on level
 function draw() {
   clear();
   // background('lightyellow');
@@ -194,16 +204,12 @@ function draw() {
   if (startBtn.mouse.presses()) {
     playSound(8);
     console.log('startBtn sound 8');
-    // gameStart = true;
-    // allowFlip = true;
     bunny.visible = false;
-    // endMessage.visible = false;
     carrots.visible = false;
     startBtn.visible = false;
     startBtn.collider = 'n';
     createLevel(level);
     startTime = millis();
-    // levelScreen();
   }
 
   ///// Next Level /////
@@ -218,11 +224,8 @@ function draw() {
   if (levelBtn.mouse.presses()){
     playSound(1);
     console.log('levelBtn sound 1');
-    // gameStart = true;
-    // allowFlip = true;
     bunny.visible = false; 
     balls.visible = false; 
-    // endMessage.visible = false;
     carrots.visible = false;
     levelBtn.visible = false;
     levelBtn.collider = 'n';
@@ -238,7 +241,6 @@ function draw() {
     if (balls.length < 25){
       let ball = new balls.Sprite();
       ball.color = color(random(255),random(255),random(255),random(60,100));
-      // animation test: ball.img = ballImages[round(random(4))];
     }
   } else {
     balls.removeAll();
@@ -255,6 +257,11 @@ function draw() {
   }
 }
 
+// This global mousePressed will check if clicking on card
+// Then check if card is already flipped
+// Otherwise, it will flip the card and check if there is a match
+// Update card remaining count and score appropriately
+// Also check for bonus cards
 function mousePressed() {
   if (allowFlip){
     for (let card of cards) {
@@ -294,6 +301,7 @@ function mousePressed() {
   }
 }
 
+// This is the secret key to skip level
 function keyPressed(k){
   if (k.code === 'KeyP'){
     playSound(10);
@@ -302,6 +310,8 @@ function keyPressed(k){
   }
 }
 
+// If secret key is pressed, show the level button and
+// update appropriate variables
 function showLevel(){
   // Skip level: Press P key
       gameStart = false;
@@ -316,24 +326,7 @@ function showLevel(){
       flipCards = []; // avoid cardRemain error
 }
 
-// function levelScreen(){
-  
-//   lTime = 5 - round((millis()-startTime)/1000);
-//   console.log('startTime ',startTime,'ltime',lTime);
-//   endMessage.text = 'Level '+level.l;
-//   if (lTime > 0){
-//     endMessage.visible = true;
-//     if (lTime <= 3){
-//       textSize(30);
-//       text('Ready in : '+lTime.toString(), width*0.5, height*0.5);
-//     }
-//   } else if (lTime == 0) {
-//     gameStart = true;
-//     allowFlip = true;
-//     endMessage.visible = false;
-//   }
-// }
-
+// Play a sound base on event. 'i' defines the sound to play
 function playSound(i){
   if (!isMute){
     sounds[i].play();
@@ -342,6 +335,9 @@ function playSound(i){
   }
 }
 
+// Display header info such as card remaining, score, time, etc.
+// Also control sound mute state and level screen
+// Check for winning or losing state
 function topBar(){
   textSize(25);
   fill('blue'); // set text color to blue
@@ -368,11 +364,6 @@ function topBar(){
   if (gameStart){
     text('Score: '+score.toString(),width*0.5,height*0.05);
 
-    // soundBtn.x = width*0.75;
-    // soundBtn.y = height*0.062;
-    // soundBtn.scale = 0.3;
-    // soundBtn.w = 30;
-    // soundBtn.h = 30;
     ///// prevent time to run over 0 /////
     if (gameTime > 0) {
       text('Cards: '+cardRemain.toString(), width*0.15, height*0.05);
@@ -390,6 +381,8 @@ function topBar(){
     else {
       text('Time : 0', width*0.85, height*0.05);
       gameStart = false;
+
+      // check losing condition
       if ((cardRemain > 0)&&(!levelBtn.visible)){
         loseGame();
         playSound(7);
@@ -412,16 +405,8 @@ function topBar(){
         \nMatch all the cards to proceed next level.',width*0.15,height*0.75);
     }
   }
-  // else {
-  //   text('Level '+level.l, width*0.5, height*0.05);
-    
-    // soundBtn.x = width*0.5;
-    // soundBtn.y = height*0.65;
-    // soundBtn.scale = 1;
-    // soundBtn.w = 100;
-    // soundBtn.h = 100;
-  // }
 
+  // Mute control
   if (soundBtn.mouse.presses()) {
     isMute = !isMute;
     console.log('isMute',isMute);
@@ -433,6 +418,7 @@ function topBar(){
   }
 }
 
+// Based on level, generate random cards
 function createLevel(level){
   cards = [];
   levelImages = [];
@@ -493,6 +479,7 @@ function createLevel(level){
   }
 }
 
+// Check if card is a bonus card and update bonus appropriately
 function checkBonus(img){
     if (img === bonusImages[0]){
         levelTime += 10;
@@ -505,6 +492,7 @@ function checkBonus(img){
     }
 }
 
+// Win game screen
 function winGame(){
   bunny.img = winImage;
   bunny.visible = true;
@@ -522,6 +510,7 @@ function winGame(){
   endMessage.text = 'You Win!\n\nYour Score : '+score;
 }
 
+// Lose game screen
 function loseGame(){
   bunny.img = loseImage;
   bunny.visible = true;
@@ -533,6 +522,7 @@ function loseGame(){
   startBtn.collider = 's';
 }
 
+// Reset game variables
 function resetGame(){
   score = 0;
   allowFlip = false;
@@ -541,9 +531,16 @@ function resetGame(){
 
 // Window resized function will run when "reload" after a browser window resize
 function windowResized(){
-  // Canvas is set to 80% width and height - match setup scale
-  resizeCanvas(windowWidth*0.9, windowHeight*0.9);
+  // Canvas is set to 95% width and height - match setup scale
+  resizeCanvas(windowWidth*0.95, windowHeight*0.95);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Reference
+// P5play: https://p5play.org/learn/
+//        * P5play is a javascript game engine that uses p5js library to
+//          allow more comprehensive interaction and specifically tailor to 
+//          build game in 2D or 3D mode with easy to learn features.
+//
+// P5 JS lib: https://p5js.org/reference/
+///////////////////////////////////////////////////////////////////////////////
