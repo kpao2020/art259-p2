@@ -7,9 +7,7 @@ Game link: https://editor.p5js.org/kpao2020/full/fzBTVf7VF
 
 Reference
 P5play: https://p5play.org/learn/
-        * P5play is a javascript game engine that uses p5js library to
-          allow more comprehensive interaction and specifically tailor to 
-          build game in 2D or 3D mode with easy to learn features.
+        * P5play is a javascript game engine that uses p5js library to allow more comprehensive interaction and specifically tailor to build game in 2D or 3D mode with easy to learn features.
 
- P5 JS lib: https://p5js.org/reference/
+P5 JS lib: https://p5js.org/reference/
 
