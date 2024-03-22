@@ -105,9 +105,7 @@ function preload() {
 
 // Setup Canvas and initialize variables
 function setup() {
-  let cnv = createCanvas(windowWidth*0.95, windowHeight*0.95);
-
-  // cnv.doubleClicked(showLevel);
+  new Canvas(windowWidth*0.95, windowHeight*0.95);
 
   // initialize level 1 parameters
   level = {
@@ -178,7 +176,7 @@ function setup() {
 // createLevel = random load cards and bonus base on level
 function draw() {
   clear();
-  // background('lightyellow');
+
   background(bg);
   
   // Start page animation
