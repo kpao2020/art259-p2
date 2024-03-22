@@ -2,7 +2,7 @@
 // Class: ART 259
 // Assignment: Project 2
 // Title: Bunny Cards
-// Game link 1: 
+// Game link 1: https://kpao2020.github.io/art259-p2/
 // Game link 2: https://bunny-cards.glitch.me
 // Reference: listed at the end of this file
 ///////////////////////////////////////////////////////////////////////////////
