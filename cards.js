@@ -124,7 +124,7 @@ function setup() {
   balls.d = () => random (5, 10);
   balls.collider = 'none'; // no collision needed for balls animation
 	balls.direction = () => random(0, 360);
-	balls.speed = () => random(1, 3);
+	// balls.speed = () => random(1, 5);
   balls.visible = false;
   balls.life = 120; // 2 seconds
 
@@ -236,6 +236,7 @@ function draw() {
 
   // Winning animation
   if (balls.visible){
+    balls.speed = () => random(1, 5);
     if (balls.length < 25){
       let ball = new balls.Sprite();
       ball.color = color(random(255),random(255),random(255),random(60,100));
