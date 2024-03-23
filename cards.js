@@ -124,7 +124,9 @@ function setup() {
   balls.d = () => random (5, 10);
   balls.collider = 'none'; // no collision needed for balls animation
 	balls.direction = () => random(0, 360);
-	balls.speed = () => random(1, 3);
+  // for local p5 lib, balls.speed is not working at setup function
+  // has to declare balls.speed right before new balls.Sprite(); line
+	// balls.speed = () => random(1, 5);  line 241
   balls.visible = false;
   balls.life = 120; // 2 seconds
 
@@ -236,6 +238,7 @@ function draw() {
 
   // Winning animation
   if (balls.visible){
+    balls.speed = () => random(1, 5); // work at local p5 lib
     if (balls.length < 25){
       let ball = new balls.Sprite();
       ball.color = color(random(255),random(255),random(255),random(60,100));
