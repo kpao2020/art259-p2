@@ -105,8 +105,8 @@ function preload() {
 
 // Setup Canvas and initialize variables
 function setup() {
-  new Canvas(windowWidth*0.95, windowHeight*0.95);
-
+  let cnvs = createCanvas(windowWidth*0.95, windowHeight*0.95);
+  cnvs.parent('p2');
   // initialize level 1 parameters
   level = {
     l: 1,
@@ -405,6 +405,8 @@ function topBar(){
         \nEach incorrect guess = -10 points\
         \nEach correct match   = +100 points\
         \nMatch all the cards to proceed next level.',width*0.15,height*0.75);
+      text('ART 259 Project 2\
+        \nBy: Ken Pao & Yuying Huang', width*0.15, height*0.65);
     }
   }
 
