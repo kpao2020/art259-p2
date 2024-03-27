@@ -105,7 +105,7 @@ function preload() {
 
 // Setup Canvas and initialize variables
 function setup() {
-  let cnvs = createCanvas(windowWidth*0.95, windowHeight*0.95);
+  let cnvs = createCanvas(windowWidth, windowHeight);
   cnvs.parent('p2');
   // initialize level 1 parameters
   level = {
