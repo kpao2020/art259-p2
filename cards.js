@@ -404,9 +404,10 @@ function topBar(){
         \nEach level has bonus card(s)\
         \nEach incorrect guess = -10 points\
         \nEach correct match   = +100 points\
-        \nMatch all the cards to proceed next level.',width*0.15,height*0.75);
-      text('ART 259 Project 2\
-        \nBy: Ken Pao & Yuying Huang', width*0.15, height*0.65);
+        \nMatch all the cards to proceed next level.',width*0.12,height*0.76);
+      // fill('lightgreen');
+        text('ART 259 Project 2\
+        \nBy: Ken Pao & Yuying Huang', width*0.12, height*0.65);
     }
   }
 
