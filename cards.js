@@ -2,6 +2,7 @@
 // Class: ART 259
 // Assignment: Project 2
 // Title: Bunny Cards
+// Version : 3.2
 // Game link 1: https://kpao2020.github.io/art259-p2/
 // Game link 2: https://bunny-cards.glitch.me
 // Reference: listed at the end of this file
@@ -82,7 +83,7 @@ function preload() {
   backImage = loadImage('image/bunnyBack.png');
   winImage = loadImage('image/win.png');
   loseImage = loadImage('image/lose.png');
-  bg = loadImage('image/background.jpg');
+  bg = loadImage('image/bgTitle.jpg');
   soundOnImg = loadImage('image/soundOn50.png');
   soundOffImg = loadImage('image/soundOff50.png');
 
@@ -165,7 +166,7 @@ function setup() {
   allowFlip = false;
   score = 0;
   
-  endMessage = new Sprite(width*0.5, height*0.3, 1, 'n');
+  endMessage = new Sprite(width*0.5, height*0.35, 1, 'n');
   endMessage.color = 'lightyellow';
   endMessage.textSize = 50;
   endMessage.textColor = 'red';
@@ -394,20 +395,29 @@ function topBar(){
   } else {
     // Show Title of Game and Instructions
     if ((startBtn.visible) && (startBtn.text === 'START')){
-      endMessage.text = "Bunny Cards";
+      endMessage.textColor = 'blue';
+      endMessage.text = "Click START to play";
       endMessage.visible = true;
-      fill(255);
+      fill('blue');
       textAlign(LEFT);
       textSize(30);
+      
+      text('ART 259 Project 2\
+        \nBy: Ken Pao & Yuying Huang', width*0.05, height*0.3);
       text(
         'Rules:\
-        \nEach level has bonus card(s)\
+        \nEach level has bonus cards\
         \nEach incorrect guess = -10 points\
         \nEach correct match   = +100 points\
-        \nMatch all the cards to proceed next level.',width*0.12,height*0.76);
-      // fill('lightgreen');
-        text('ART 259 Project 2\
-        \nBy: Ken Pao & Yuying Huang', width*0.12, height*0.65);
+        \nMatch all the cards to proceed next level.',width*0.05,height*0.4);
+      // text(
+      //   'Rules:\
+      //   \nEach level has bonus card(s)\
+      //   \nEach incorrect guess = -10 points\
+      //   \nEach correct match   = +100 points\
+      //   \nMatch all the cards to proceed next level.',width*0.12,height*0.76);
+      //   text('ART 259 Project 2\
+      //   \nBy: Ken Pao & Yuying Huang', width*0.12, height*0.65);
     }
   }
 
