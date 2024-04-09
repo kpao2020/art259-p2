@@ -1,8 +1,8 @@
 // Team : Ken Pao, Yuying Huang
 // Class: ART 259
 // Assignment: Project 2
-// Title: Bunny Cards 
-// Version: 5.0
+// Title: Bunny Cards
+// Version : 3.2
 // Game link: https://kpao2020.github.io/art259-p2/
 // Reference: listed at the end of this file
 ///////////////////////////////////////////////////////////////////////////////
@@ -16,10 +16,10 @@ let backImage; // Back of card image
 let cardSize; // Card size based on level and screen size
 let space; // Spacer between cards
 let level; // Level grid
-let gameTime, startTime, levelTime, lTime, winTime; // Timing variables
+let gameTime, startTime, levelTime, lTime; // Timing variables
 let startBtn, levelBtn; // Start button
 let gameStart; // Game start state = true or false
-let score, tScore; // Keep track of score
+let score; // Keep track of score
 let cardRemain; // Keep track of remaining cards
 let balls; // End game animation
 let endMessage; // Display end game message
@@ -27,10 +27,7 @@ let allowFlip; // Flip control state
 let carrots, carrotImages=[]; // Start page animation
 let bunny, winImage, loseImage; // Win/Lose page image
 let sounds, soundBtn, isMute, soundOnImg, soundOffImg; // Sound variables
-let bg, bg1; // Background image
-let dp, isBonus; // Double Point Bonus state and check
-let bonusFlip, bonusOpen=[]; // Bonus Open Cards count and array
-let winPair; // Win match cards animation
+let bg; // Background image
 
 // Class Card defines coordinate, size, image, 
 // flip state, mouse hover check and display function
@@ -42,18 +39,11 @@ class Card {
     this.h = size.h;
     this.img = img;
     this.flipped = false; // false = face down
-    this.bonus = false;
   }
 
   // show card image
   display() {
-    if (this.bonus){
-      strokeWeight(10);
-      stroke('gold');
-    } else {
-      strokeWeight(0); 
-    }
-    rect(this.x, this.y, this.w, this.h, 5);
+    rect(this.x, this.y, this.w, this.h);
     if (this.flipped) {
       image(this.img, this.x, this.y, this.w, this.h);
     } else {
@@ -70,22 +60,17 @@ class Card {
   flip() {
     this.flipped = !this.flipped;
   }
-
-  // Bonus state
-  setBonus() {
-    this.bonus = !this.bonus;
-  }
 }
 
 // Preload images and sound files into memory
 function preload() {
-  // Load all card images - total 40
-  for (let i = 0; i < 40; i++) {
+  // Load all card images - total 26
+  for (let i = 0; i < 26; i++) {
     cardImages.push(loadImage('image/bunny'+i+'.png')); 
   }
 
-  // Load all bonus images - total 10
-  for (let b = 0; b < 10; b++) {
+  // Load all bonus images - total 4
+  for (let b = 0; b < 4; b++) {
     bonusImages.push(loadImage('image/bonus'+b+'.png')); 
   }
 
@@ -98,7 +83,6 @@ function preload() {
   winImage = loadImage('image/win.png');
   loseImage = loadImage('image/lose.png');
   bg = loadImage('image/bgTitle.jpg');
-  bg1 = loadImage('image/bg.jpg');
   soundOnImg = loadImage('image/soundOn50.png');
   soundOffImg = loadImage('image/soundOff50.png');
 
@@ -132,7 +116,7 @@ function setup() {
   space = 20;
 
   // no Stroke for cards
-  strokeWeight(0);
+  noStroke();
 
   balls = new Group();
   balls.x = width*0.54; // balls animation test: ball.x = () => random(width*0.2, width*0.8);
@@ -180,23 +164,12 @@ function setup() {
   gameStart = false;
   allowFlip = false;
   score = 0;
-  dp = false;
-  isBonus = false;
-  bonusFlip = 0;
   
   endMessage = new Sprite(width*0.5, height*0.35, 1, 'n');
   endMessage.color = 'lightyellow';
   endMessage.textSize = 50;
-  endMessage.textColor = 'blue';
+  endMessage.textColor = 'red';
   endMessage.visible = false;
-
-  winPair = new Group();
-  winPair.vel.y = -1;
-  winPair.amount = 2;
-  winPair.textSize = 38;
-  winPair.textColor = 'lime';
-  winPair.visible = false;
-  winPair.life = 60;
 }
 
 // Draw function calls following functions
@@ -256,7 +229,7 @@ function draw() {
     carrots.visible = false;
     levelBtn.visible = false;
     levelBtn.collider = 'n';
-    if (level.l < 5){
+    if (level.l < 3){
       level.l++;
     }
     createLevel(level);
@@ -269,7 +242,7 @@ function draw() {
       let ball = new balls.Sprite();
       ball.direction =  random(0, 360);
       ball.speed =  random(1, 5); // work at local p5 lib
-      ball.color = color(random(255),random(255),random(255),random(80,100));
+      ball.color = color(random(255),random(255),random(255),random(60,100));
     }
   } else {
     balls.removeAll();
@@ -299,55 +272,32 @@ function mousePressed() {
         playSound(0);
         console.log('flip 1st card sound 0');
         cardRemain--;
-
-          if (bonusFlip > 0){
-            if (matchOBC(card)){
-              console.log('check OBC = true');
-          } else {
-              console.log('check OBC = false');
-            flipCards.push(card);
-          }} else {
-            console.log('bonusFlip == 0');
-            flipCards.push(card);
-          }
+        flipCards.push(card);
         if (flipCards.length === 2) {
           if (flipCards[0].img === flipCards[1].img) {
             // Match section
             // console.log('match');
-            
             score += 100;
             playSound(9);
             console.log('match sound 9');
-
-            isBonus = checkBonus(flipCards[0],flipCards[1]);
-
-            if (!isBonus){
-              if (dp == true) {
-                score += 100;
-                dp = false;
-                matchAni(flipCards[0],flipCards[1],'+200');
-              } else {
-                matchAni(flipCards[0],flipCards[1],'+100');
-              }
-            }
+            checkBonus(flipCards[1].img);
             flipCards = [];
-          }
-          else {
+          } else {
             // Not a match, flip back after a delay of 0.5 second
             // console.log('not match');
-              allowFlip = false;
-              setTimeout(() => {
-                flipCards[0].flip();
-                flipCards[1].flip();
-                cardRemain += 2;
-                flipCards = [];
-                if (score > 0){
-                  score -= 10;
-                }
-                allowFlip = true;
-              }, 500);
+            allowFlip = false;
+            setTimeout(() => {
+              flipCards[0].flip();
+              flipCards[1].flip();
+              cardRemain += 2;
+              flipCards = [];
+              if (score > 0){
+                score -= 10;
+              }
+              allowFlip = true;
+            }, 500);
           }
-        } 
+        }
       }
     }
   }
@@ -358,15 +308,6 @@ function keyPressed(k){
   if (k.code === 'KeyP'){
     playSound(10);
     console.log('p key sound 10');
-    showLevel();
-  } else if (k.code === 'Digit5'){
-    level.l = 4;
-    showLevel();
-  } else if (k.code === 'Digit4'){
-    level.l = 3;
-    showLevel();
-  } else if (k.code === 'Digit3'){
-    level.l = 2;
     showLevel();
   }
 }
@@ -380,7 +321,7 @@ function showLevel(){
       allowFlip = false;
       levelBtn.visible = true;
       levelBtn.collider = 's';
-      levelBtn.text = `Secret skip \nto level ${level.l+1}`;
+      levelBtn.text = 'Secret Skip'
       startBtn.visible = false;
       startBtn.collider = 'n';
       carrots.visible = false;
@@ -413,7 +354,7 @@ function topBar(){
     endMessage.text = 'Level '+level.l;
     if (lTime <= 3){
       textSize(60);
-      text(lTime.toString(), width*0.5, height*0.45);
+      text(lTime.toString(), width*0.5, height*0.4);
     }
   } else if (lTime == 0) {
     gameStart = true;
@@ -453,11 +394,13 @@ function topBar(){
   } else {
     // Show Title of Game and Instructions
     if ((startBtn.visible) && (startBtn.text === 'START')){
+      endMessage.textColor = 'blue';
       endMessage.text = "Click START to play";
       endMessage.visible = true;
       fill('blue');
       textAlign(LEFT);
-      textSize(20);
+      textSize(30);
+      
       text('ART 259 Project 2\
         \nBy: Ken Pao & Yuying Huang', width*0.05, height*0.3);
       text(
@@ -472,21 +415,12 @@ function topBar(){
       //   \nEach incorrect guess = -10 points\
       //   \nEach correct match   = +100 points\
       //   \nMatch all the cards to proceed next level.',width*0.12,height*0.76);
-      // // fill('lightgreen');
       //   text('ART 259 Project 2\
       //   \nBy: Ken Pao & Yuying Huang', width*0.12, height*0.65);
     }
   }
 
   // Mute control
-  // if (soundBtn.mouse.hovering()){
-  //   soundBtn.color = 'yellow';
-  //   cursor(HAND);
-  // } else {
-  //   soundBtn.color = 'lime';
-  //   cursor(ARROW);
-  // }
-
   if (soundBtn.mouse.presses()) {
     isMute = !isMute;
     console.log('isMute',isMute);
@@ -502,37 +436,31 @@ function topBar(){
 function createLevel(level){
   cards = [];
   levelImages = [];
-  
+
   // each level contains row and column size
   // which adjust how many card images involved per level
   if (level.l == 1){
     level.row = 4;
     level.col = 5;
     levelTime = 60;
+    levelImages.push(bonusImages[0]);
+    levelImages.push(bonusImages[0]);
   } else if (level.l == 2){
     level.row = 5;
     level.col = 8;
     levelTime = 180;
+    levelImages.push(bonusImages[0]);
+    levelImages.push(bonusImages[1]);
+    levelImages.push(bonusImages[0]);
+    levelImages.push(bonusImages[1]);
   } else if (level.l == 3){
     level.row = 6;
     level.col = 10;
-    levelTime = 250;
-  } else if (level.l == 4){
-    level.row = 8;
-    level.col = 10;
     levelTime = 300;
-  } else if (level.l == 5){
-    level.row = 10;
-    level.col = 10;
-    levelTime = 310;
-  }
-
-  let bonusMax = 2*level.l;
-
-  // j = load bonus image twice (pair match)
-  // i = load each bonus image per level 
-  for (let j = 0; j < 2; j++){
-    for (let i = 0; i < bonusMax; i++){
+    for (let i = 0; i < bonusImages.length; i++){
+      levelImages.push(bonusImages[i]);
+    }
+    for (let i = 0; i < bonusImages.length; i++){
       levelImages.push(bonusImages[i]);
     }
   }
@@ -548,7 +476,7 @@ function createLevel(level){
   
   shuffle(cardImages, true);
   cardRemain = level.row * level.col;
-  let k = cardRemain - (2*bonusMax); // 2*bonusMax = bonus cards pairs
+  let k = cardRemain - pow(2, level.l); // 2^level.l = bonus cards
   for (let x = 0; x < k; x++){
     levelImages.push(cardImages[x % (k/2)]);
   }
@@ -566,137 +494,24 @@ function createLevel(level){
 }
 
 // Check if card is a bonus card and update bonus appropriately
-function checkBonus(c1,c2){
-    if (c1.img === bonusImages[0]){
+function checkBonus(img){
+    if (img === bonusImages[0]){
         levelTime += 10;
-        matchAni(c1, c2, '+10s');
-        return true;
-
-    } else if (c1.img === bonusImages[1]){
-        if (dp == true){
-          score += 200;
-          dp = false;
-          matchAni(c1,c2,'+300');
-        } else {
-          score += 100;
-          matchAni(c1, c2, '+200');
-        }
-        return true;
-
-    } else if (c1.img === bonusImages[2]){
+    } else if (img === bonusImages[1]){
+        score += 100;
+    } else if (img === bonusImages[2]){
         levelTime += 30;
-        matchAni(c1, c2, '+30s');
-        return true;
-
-    } else if (c1.img === bonusImages[3]){
-        if (dp == true){
-          score += 1000;
-          matchAni(c1, c2, '+1100');
-          dp = false;
-        } else {
-          score += 500;
-          matchAni(c1, c2, '+600');
-        }
-        return true;
-
-    } else if (c1.img === bonusImages[4]){
-        if (dp == true){
-          score += 2000;
-          matchAni(c1, c2, '+2100');
-          dp = false;
-        } else {
-          score += 1000;
-          matchAni(c1, c2, '+1100');
-        }
-        return true;
-
-    } else if (c1.img === bonusImages[5]){
-        levelTime += 60;
-        matchAni(c1, c2, '+60s');
-        return true;
-
-    } else if (c1.img === bonusImages[6]){
-        levelTime += 90;
-        matchAni(c1, c2, '+90s');
-        return true;
-
-    } else if (c1.img === bonusImages[7]){
-        dp = true;
-        matchAni(c1, c2, '2x Points');
-        return true;
-
-    } else if (c1.img === bonusImages[8]){
-        if (dp == true){
-          score += 4000;
-          matchAni(c1, c2, '+4100');
-          dp = false;
-        } else {
-          score += 2000;
-          matchAni(c1, c2, '+2100');
-        }
-        return true;
-
-    } else if (c1.img === bonusImages[9]){
-        bonusFlip = 5;
-        matchAni(c1, c2, '+5 open');
-        openBonusCards(bonusFlip);
-        return true;
-
-    } else {
-        return false;
+    } else if (img === bonusImages[3]){
+        score += 500;
     }
-}
-
-function openBonusCards(count){
-  for (let i = 0; i < count; i++){
-    let openCard = random(cards);
-    if (openCard.flipped){
-      console.log('random openCard already flipped',openCard);
-      count++; // need to random again to open an unflipped card.
-    } else {
-      openCard.flip();
-      openCard.setBonus();
-      bonusOpen.push(openCard);
-      console.log('openCard not flipped',openCard,'bO length',bonusOpen.length);
-    }
-  }
-  cardRemain -= bonusOpen.length;
-}
-
-// check Open Bonus Cards if match flipped card
-function matchOBC(fCard){
-  if (bonusOpen.length > 0){
-    for (let i = 0; i < bonusOpen.length; i++){
-      if (fCard.img === bonusOpen[i].img){
-        bonusOpen[i].setBonus();
-        isBonus = checkBonus(fCard, bonusOpen[i]);
-        if (!isBonus){
-          score += 100;
-          matchAni(fCard,bonusOpen[i],'+100');
-        }
-        bonusOpen.splice(i,1);
-        bonusFlip--;
-        return true;
-      }
-    }
-  }
-}
-
-function matchAni(c1,c2,msg){
-  strokeWeight(0);
-  let w1 = new winPair.Sprite(c1.w/2+c1.x, c1.y, 1, 'n');
-  let w2 = new winPair.Sprite(c2.w/2+c2.x, c2.y, 1, 'n');
-  w1.text = w2.text = msg;
-  winPair.visible = true; // winPair life = 2 sec
 }
 
 // Win game screen
 function winGame(){
-  
   bunny.img = winImage;
   bunny.visible = true;
   balls.visible = true;
-  if (level.l < 5){
+  if (level.l < 3){
     levelBtn.text = 'Next\nLevel '+(level.l+1);
   } else {
     levelBtn.text = 'Replay\nLevel '+(level.l);
@@ -705,19 +520,12 @@ function winGame(){
   levelBtn.collider = 's';
   startBtn.visible = false;
   startBtn.collider = 'n';
-  strokeWeight(0);
   endMessage.visible = true;
-  winTime = gameTime;
-  tScore = winTime * 10 + score;
-  endMessage.text = `\n\nYou Win!
-                    \nTime Completed : ${winTime} s 
-        Your Score : ${score}
-        Total Score : ${tScore}`;
+  endMessage.text = 'You Win!\n\nYour Score : '+score;
 }
 
 // Lose game screen
 function loseGame(){
-  strokeWeight(0);
   bunny.img = loseImage;
   bunny.visible = true;
   endMessage.visible = true;
@@ -731,17 +539,14 @@ function loseGame(){
 // Reset game variables
 function resetGame(){
   score = 0;
-  tScore = 0;
   allowFlip = false;
   flipCards = [];
-  bonusFlip = 0;
-  bonusOpen = [];
 }
 
 // Window resized function will run when "reload" after a browser window resize
 function windowResized(){
   // Canvas is set to 95% width and height - match setup scale
-  resizeCanvas(windowWidth, windowHeight);
+  resizeCanvas(windowWidth*0.95, windowHeight*0.95);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
