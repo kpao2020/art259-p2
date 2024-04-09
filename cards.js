@@ -709,10 +709,10 @@ function winGame(){
   endMessage.visible = true;
   winTime = gameTime;
   tScore = winTime * 10 + score;
-  endMessage.text = `You Win!
-                    \n\nTime Completed : ${winTime} s 
-                    \nYour Score : ${score}
-                    \nTotal Score : ${tScore}`;
+  endMessage.text = `\n\nYou Win!
+                    \nTime Completed : ${winTime} s 
+        Your Score : ${score}
+        Total Score : ${tScore}`;
 }
 
 // Lose game screen
