@@ -97,7 +97,7 @@ function preload() {
   backImage = loadImage('image/bunnyBack.png');
   winImage = loadImage('image/win.png');
   loseImage = loadImage('image/lose.png');
-  bg = loadImage('image/bgTitle.jpg');
+  bg = loadImage('image/bgTitle.png');
   bg1 = loadImage('image/bg.jpg');
   soundOnImg = loadImage('image/soundOn50.png');
   soundOffImg = loadImage('image/soundOff50.png');
@@ -187,7 +187,7 @@ function setup() {
   endMessage = new Sprite(width*0.5, height*0.35, 1, 'n');
   endMessage.color = 'lightyellow';
   endMessage.textSize = 50;
-  endMessage.textColor = 'blue';
+  endMessage.textColor = 'red';
   endMessage.visible = false;
 
   winPair = new Group();
