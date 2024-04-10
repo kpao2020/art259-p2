@@ -27,7 +27,7 @@ let allowFlip; // Flip control state
 let carrots, carrotImages=[]; // Start page animation
 let bunny, winImage, loseImage; // Win/Lose page image
 let sounds, soundBtn, isMute, soundOnImg, soundOffImg; // Sound variables
-let bg, bg1; // Background image
+let bg; // Background image
 let dp, isBonus; // Double Point Bonus state and check
 let bonusFlip, bonusOpen=[]; // Bonus Open Cards count and array
 let winPair; // Win match cards animation
@@ -98,7 +98,6 @@ function preload() {
   winImage = loadImage('image/win.png');
   loseImage = loadImage('image/lose.png');
   bg = loadImage('image/bgTitle.png');
-  bg1 = loadImage('image/bg.jpg');
   soundOnImg = loadImage('image/soundOn50.png');
   soundOffImg = loadImage('image/soundOff50.png');
 
